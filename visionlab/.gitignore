@@ -1,0 +1,37 @@
+# ── Secrets ──
+.env
+*.local.env
+
+# ── Python ──
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ── Virtual envs ──
+.venv/
+venv/
+env/
+
+# ── Models / caches ──
+models/
+.yolo_cache/
+*.pt
+
+# ── Outputs ──
+audio_outputs/*.mp3
+image_outputs/*.jpg
+image_outputs/*.png
+
+# ── IDE / OS ──
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.swp
+
+# ── Logs ──
+*.log

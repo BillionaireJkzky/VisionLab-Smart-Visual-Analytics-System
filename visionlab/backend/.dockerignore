@@ -1,0 +1,40 @@
+# Python build artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual envs (we don't need them inside the image)
+.venv/
+venv/
+env/
+
+# Local secrets (mount or use env vars instead)
+.env
+*.local.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Git
+.git/
+.gitignore
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Output dirs that should be volume-mounted, not baked in
+audio_outputs/*.mp3
+image_outputs/*.jpg
+image_outputs/*.png
+
+# Tests and dev-only files
+tests/
+*.md
+fix_tasks.py
