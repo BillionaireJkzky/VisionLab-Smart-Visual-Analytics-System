@@ -17,7 +17,7 @@ from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
-_MAX_TTS_CHARS = 450
+_MAX_TTS_CHARS = 5000
 
 
 def _clean_text(text: str) -> str:
