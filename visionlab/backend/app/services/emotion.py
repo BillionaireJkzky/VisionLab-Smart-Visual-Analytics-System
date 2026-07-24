@@ -7,7 +7,7 @@ Performance changes:
 2. `warmup_emotion()` runs one tiny analysis to load the underlying
    weights into memory at worker startup.
 3. The image is resized to a max edge of 720 px before the face detector
-   runs. DeepFace's OpenCV detector slows roughly quadratically with size.
+   runs, since detector runtime grows roughly quadratically with size.
 4. If detections from YOLO already say there is no `person` in the frame,
    we skip the DeepFace call entirely with `skip_if_no_person=True`. This
    is the single biggest win on object-only images (cars, food, scenery).
@@ -59,7 +59,7 @@ def warmup_emotion() -> None:
     try:
         dummy = np.zeros((128, 128, 3), dtype=np.uint8)
         DeepFace.analyze(
-            img_path=dummy, actions=["emotion"], detector_backend="opencv",
+            img_path=dummy, actions=["emotion"], detector_backend="mtcnn",
             enforce_detection=False, silent=True,
         )
         logger.info("DeepFace warmed up.")
@@ -157,7 +157,7 @@ def run_emotion_recognition(
         analyses = DeepFace.analyze(
             img_path=img_array,
             actions=["emotion"],
-            detector_backend="opencv",
+            detector_backend="mtcnn",
             enforce_detection=False,
             silent=True,
         )
