@@ -30,13 +30,16 @@
 
 VisionLab is a distributed, asynchronous, multi-model AI web application that delivers real-time image intelligence in an accessible format. The system accepts image uploads and produces:
 
-- **Object detection** results with bounding boxes, confidence scores, and location descriptors (YOLOv8)
+- **Object detection** with bounding boxes, confidence scores, and location descriptors (YOLOv8)
 - **Facial emotion recognition** with child-friendly labels and Social Story descriptions (DeepFace)
 - **Multilingual text extraction** with English translation (EasyOCR + deep-translator)
 - **Scene classification** using Vision Transformers (HuggingFace ViT)
-- **AI-generated stories** in three modes: Fun Adventure, Social Story (ASD), Educational (ELL)
-- **Text-to-speech audio narration** (gTTS)
+- **AI-generated stories** in three modes: Fun Adventure, Social Story (ASD), Educational (ELL) — via Gemini
+- **Text-to-speech audio narration** synthesised directly from the generated story text (gTTS)
 - **Adaptive vocabulary quiz** with SM-2 spaced repetition scheduling
+- **Annotated result image** with detection boxes drawn in a stable per-label colour palette
+
+Each pipeline run streams **per-step progress** (`waiting` → `running` → `done`/`failed`/`skipped`) so the frontend can show live status while the worker processes an upload.
 
 ---
 
@@ -50,13 +53,15 @@ VisionLab is a distributed, asynchronous, multi-model AI web application that de
                             │ HTTP / REST
 ┌───────────────────────────▼─────────────────────────────────────┐
 │                    FastAPI (ASGI / Uvicorn)                      │
-│   JWT Auth · Image Upload · Task Polling · Vocabulary API       │
+│  JWT Auth · Request-ID + Rate-Limit Middleware · Image Upload   │
+│           · Task Polling · Vocabulary API · Admin API           │
 └───────────────────────────┬─────────────────────────────────────┘
                             │ Celery task
 ┌───────────────────────────▼─────────────────────────────────────┐
 │              Celery Worker (Redis broker)                        │
 │                                                                 │
-│  YOLOv8 → DeepFace → EasyOCR → ViT → LLM Story → gTTS → SM-2  │
+│  YOLOv8 → DeepFace → EasyOCR → ViT → Gemini Story → gTTS → SM-2│
+│                     (progress tracked per step)                 │
 └───────────────────────────┬─────────────────────────────────────┘
                             │ SQLAlchemy (async)
 ┌───────────────────────────▼─────────────────────────────────────┐
@@ -75,12 +80,13 @@ VisionLab is a distributed, asynchronous, multi-model AI web application that de
 | **Task Queue** | Celery 5.4 + Redis 7 |
 | **Database** | PostgreSQL 16 + SQLAlchemy 2 (async) + Alembic |
 | **Auth** | JWT (python-jose) + bcrypt (passlib) |
+| **HTTP Middleware** | Request-ID tagging + Redis-backed rate limiting (fail-open) |
 | **Object Detection** | YOLOv8n (Ultralytics) |
 | **Emotion Recognition** | DeepFace |
 | **OCR** | EasyOCR + deep-translator |
 | **Scene Classification** | ViT (google/vit-base-patch16-224, HuggingFace) |
-| **Story Generation** | Gemini (google-generativeai) |
-| **Text-to-Speech** | gTTS |
+| **Story Generation** | Google Gemini (google-generativeai), with automatic fallback model |
+| **Text-to-Speech** | gTTS, narrating directly from the generated story text |
 | **Adaptive Quiz** | SM-2 algorithm (custom implementation) |
 | **Frontend** | React 18 + TypeScript + TailwindCSS + Vite |
 | **Containerisation** | Docker + Docker Compose |
@@ -94,48 +100,53 @@ VisionLab is a distributed, asynchronous, multi-model AI web application that de
 visionlab/
 ├── backend/
 │   ├── app/
-│   │   ├── api/            # FastAPI routers
-│   │   │   ├── auth.py     # Registration, login, /me
-│   │   │   ├── analysis.py # Image upload, task polling, results
-│   │   │   ├── vocabulary.py # SM-2 quiz, progress, review
-│   │   │   └── admin.py    # Admin analytics
+│   │   ├── api/               # FastAPI routers
+│   │   │   ├── auth.py        # Registration, login, /me
+│   │   │   ├── analysis.py    # Image upload, task polling, results
+│   │   │   ├── vocabulary.py  # SM-2 quiz, progress, review
+│   │   │   └── admin.py       # Admin analytics
 │   │   ├── core/
-│   │   │   ├── config.py   # Pydantic settings
-│   │   │   ├── database.py # Async SQLAlchemy engine
-│   │   │   ├── security.py # JWT + bcrypt
-│   │   │   └── deps.py     # FastAPI dependencies
+│   │   │   ├── config.py      # Pydantic settings
+│   │   │   ├── database.py    # Async SQLAlchemy engine
+│   │   │   ├── security.py    # JWT + bcrypt
+│   │   │   ├── middleware.py  # Request-ID + Redis rate limiting
+│   │   │   └── deps.py        # FastAPI dependencies
 │   │   ├── models/
-│   │   │   └── models.py   # ORM: User, AnalysisTask, VocabularyItem, QuizAttempt
+│   │   │   └── models.py      # ORM: User, AnalysisTask, VocabularyItem, QuizAttempt
 │   │   ├── schemas/
-│   │   │   └── schemas.py  # Pydantic v2 request/response schemas
+│   │   │   └── schemas.py     # Pydantic v2 request/response schemas
 │   │   ├── services/
-│   │   │   ├── detection.py  # YOLOv8 object detection
-│   │   │   ├── emotion.py    # DeepFace emotion recognition
-│   │   │   ├── ocr.py        # EasyOCR + translation
-│   │   │   ├── scene.py      # ViT scene classification
-│   │   │   ├── story.py      # LLM story generation
-│   │   │   ├── tts.py        # gTTS audio synthesis
-│   │   │   └── quiz.py       # SM-2 quiz engine
+│   │   │   ├── detection.py   # YOLOv8 object detection
+│   │   │   ├── emotion.py     # DeepFace emotion recognition
+│   │   │   ├── ocr.py         # EasyOCR + translation
+│   │   │   ├── scene.py       # ViT scene classification
+│   │   │   ├── story.py       # Gemini story generation
+│   │   │   ├── tts.py         # gTTS audio synthesis from story text
+│   │   │   ├── annotate.py    # Draws detection boxes onto the result image
+│   │   │   └── quiz.py        # SM-2 quiz engine
 │   │   ├── tasks/
-│   │   │   ├── celery_app.py # Celery factory
-│   │   │   └── pipeline.py   # Main AI pipeline task
-│   │   └── main.py           # FastAPI application
-│   ├── alembic/              # Database migrations
-│   ├── tests/                # Pytest unit tests
+│   │   │   ├── celery_app.py  # Celery factory
+│   │   │   ├── steps.py       # Per-step pipeline execution + progress tracking
+│   │   │   └── pipeline.py    # Main AI pipeline task
+│   │   └── main.py            # FastAPI application
+│   ├── alembic/               # Database migrations
+│   ├── tests/                 # Pytest unit tests
 │   ├── requirements.txt
 │   ├── Dockerfile
 │   └── alembic.ini
 ├── frontend/
 │   ├── src/
-│   │   ├── components/     # Layout, shared UI
-│   │   ├── pages/          # Dashboard, Analyse, Result, Progress, History, Admin
-│   │   ├── hooks/          # useAuth, useHighContrast
-│   │   ├── services/       # Axios API client
-│   │   ├── types/          # TypeScript interfaces
-│   │   └── styles/         # TailwindCSS + accessibility CSS
+│   │   ├── components/        # Layout, shared UI
+│   │   ├── pages/             # Dashboard, Analysis, Result, Progress, History, Admin, Login, Register
+│   │   ├── hooks/              # useAuth, useHighContrast
+│   │   ├── services/          # Axios API client
+│   │   ├── types/             # TypeScript interfaces
+│   │   └── styles/             # TailwindCSS + accessibility CSS
 │   ├── Dockerfile
 │   ├── nginx.conf
 │   └── package.json
+├── docs/
+│   └── AUDIT.md
 ├── docker-compose.yml
 └── README.md
 ```
@@ -238,7 +249,7 @@ All endpoints are prefixed with `/api/v1`. Full interactive documentation is ava
 | Method | Endpoint | Description |
 |---|---|---|
 | `POST` | `/analysis/upload` | Upload image and enqueue AI pipeline |
-| `GET` | `/analysis/tasks/{task_id}` | Poll task status |
+| `GET` | `/analysis/tasks/{task_id}` | Poll task status and per-step progress |
 | `GET` | `/analysis/result/{task_id}` | Retrieve full analysis result |
 | `GET` | `/analysis/history` | List user's past analyses |
 
@@ -257,13 +268,15 @@ All endpoints are prefixed with `/api/v1`. Full interactive documentation is ava
 | `GET` | `/admin/analytics` | System-wide usage statistics |
 | `GET` | `/admin/users` | List all registered users |
 
+`/auth/login` and `/auth/register` are additionally rate-limited (10 and 5 requests/minute respectively) via the Redis-backed rate-limit middleware; `/analysis/upload` is capped at 30 requests/minute per client.
+
 ---
 
 ## AI Pipeline
 
-The Celery worker executes the following pipeline sequentially for each uploaded image:
+The Celery worker executes the following steps for each uploaded image, tracking `waiting` / `running` / `done` / `failed` / `skipped` status per step for live progress polling:
 
-1. **YOLOv8 Object Detection** — Detects objects with labels, confidence scores, bounding boxes, and relative location descriptors (top-left, centre, bottom-right, etc.).
+1. **YOLOv8 Object Detection** — Detects objects with labels, confidence scores, bounding boxes, and relative location descriptors (top-left, centre, bottom-right, etc.), then draws the boxes onto an annotated copy of the image using a stable per-label colour palette.
 
 2. **DeepFace Emotion Recognition** — Analyses each detected face and outputs the dominant emotion with a child-friendly label and description in one of three modes: `standard`, `simple`, or `social_story` (Carol Gray format).
 
@@ -271,9 +284,9 @@ The Celery worker executes the following pipeline sequentially for each uploaded
 
 4. **ViT Scene Classification** — Classifies the overall scene using `google/vit-base-patch16-224` from HuggingFace Transformers.
 
-5. **LLM Story Generation** — Constructs a structured prompt from all prior results and calls an OpenAI-compatible LLM to generate three story variants: Fun Adventure, Social Story, and Educational.
+5. **Gemini Story Generation** — Constructs a structured prompt from all prior results and calls Gemini (with an automatic fallback model on failure/timeout) to generate three story variants: Fun Adventure, Social Story, and Educational.
 
-6. **gTTS Audio Synthesis** — Composes a narration from the results and synthesises an MP3 audio file, returning a media URL.
+6. **gTTS Audio Synthesis** — Cleans the generated story text (stripping markdown and, for the Educational mode, the vocabulary list) and synthesises an MP3 narration directly from it, returning a media URL.
 
 7. **SM-2 Quiz Generation** — Generates 3 vocabulary questions (multiple choice, fill-in-the-blank, true/false) from detected object labels at the user's chosen difficulty level.
 
@@ -344,8 +357,9 @@ The test suite covers:
 | `CELERY_RESULT_BACKEND` | Celery result backend | `redis://localhost:6379/1` |
 | `GEMINI_API_KEY` | Gemini API key | (required for stories) |
 | `GEMINI_MODEL` | Primary Gemini model name | `gemini-2.5-flash` |
-| `GEMINI_FALLBACK_MODEL` | Fallback Gemini model name | `gemini-2.5-flash` |
-| `CORS_ORIGINS` | Comma-separated allowed origins | `http://localhost:5173` |
+| `GEMINI_FALLBACK_MODEL` | Fallback Gemini model name | `gemini-2.0-flash` |
+| `GEMINI_TIMEOUT_S` | Gemini request timeout (seconds) | `12` |
+| `CORS_ORIGINS` | Comma-separated allowed origins | `http://localhost:5173,http://localhost:3000,http://localhost` |
 
 ---
 
@@ -356,4 +370,3 @@ The test suite covers:
 - Wolf, T. et al. (2020) 'Transformers: State-of-the-Art NLP', *EMNLP*.
 - Wozniak, P. (1990) 'Optimization of Learning', *SuperMemo*.
 - Gray, C. (1994) *The New Social Story Book*. Future Horizons.
-
