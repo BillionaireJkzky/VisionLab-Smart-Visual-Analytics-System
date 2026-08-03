@@ -341,7 +341,7 @@ function QuizPanel({ questions, taskId }: { questions: QuizQuestion[]; taskId: s
       {q.options ? (
         <div className={clsx(
           'grid gap-2.5',
-          q.options.length === 4 ? 'grid-cols-2' : 'grid-cols-1',
+          q.options.length === 4 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1',
         )}>
           {q.options.map((opt) => {
             const isSelected = selectedAnswer === opt
@@ -610,14 +610,14 @@ function QuizModal({ questions, taskId, onClose }: {
 }) {
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm sm:p-4"
       role="dialog"
       aria-modal="true"
       aria-label="Vocabulary Quiz"
       onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
     >
       <div
-        className="w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden border border-white/10 bg-[#040d1c] shadow-2xl"
+        className="w-full h-full sm:h-auto sm:max-w-2xl sm:max-h-[90vh] flex flex-col overflow-hidden border-0 sm:border border-white/10 bg-[#040d1c] shadow-2xl"
         style={{ borderRadius: 'var(--theme-radius, 28px)' }}
       >
         <div className="flex items-center gap-3 px-5 py-3.5 border-b border-white/[0.06] shrink-0">
@@ -626,7 +626,7 @@ function QuizModal({ questions, taskId, onClose }: {
           <span className="text-xs text-slate-500 hidden sm:block">SM-2 spaced repetition</span>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-xl bg-white/[0.05] hover:bg-white/10 flex items-center justify-center text-slate-300 hover:text-white transition-colors"
+            className="w-11 h-11 sm:w-8 sm:h-8 rounded-xl bg-white/[0.05] hover:bg-white/10 flex items-center justify-center text-slate-300 hover:text-white transition-colors"
             aria-label="Close quiz"
           >
             <X className="w-3.5 h-3.5" />
@@ -763,7 +763,7 @@ function StoryTabsCard({ stories, failedStories, onQuizClick, hasQuiz, audioCurr
   return (
     <section
       aria-label="AI-Generated Stories"
-      className="flex flex-col border border-white/10 bg-white/[0.03] overflow-hidden xl:flex-1 xl:min-h-0"
+      className="flex flex-col border border-white/10 bg-white/[0.03] overflow-hidden lg:flex-1 lg:min-h-0"
       style={{ borderRadius: 'calc(var(--theme-radius, 28px) - 10px)' }}
     >
       <div className="flex items-center gap-2 px-3 py-2 border-b border-white/[0.05] shrink-0">
@@ -799,7 +799,7 @@ function StoryTabsCard({ stories, failedStories, onQuizClick, hasQuiz, audioCurr
         </div>
       )}
 
-      <div className="flex-1 min-h-0 overflow-y-auto p-3 xl:min-h-[120px]">
+      <div className="flex-1 min-h-0 overflow-y-auto p-3 lg:min-h-[120px]">
         {story ? (
           <KaraokeStory content={story.content} currentTime={audioCurrent} duration={audioDuration} />
         ) : failedStories.length > 0 ? (
@@ -868,8 +868,10 @@ function ResultDashboard({ result, taskId }: { result: AnalysisResult; taskId: s
         />
       )}
 
-      {/* Single-screen container — h-full fills the content area (parent overflow-y-auto provides the bounds) */}
-      <div className="flex flex-col gap-3 animate-fade-in h-full overflow-hidden">
+      {/* On mobile the container grows with content and the page scrolls normally.
+          From lg: up it becomes a single-screen dashboard (h-full + overflow-hidden),
+          relying on internal overflow-y-auto in each card instead of page scroll. */}
+      <div className="flex flex-col gap-3 animate-fade-in overflow-y-auto lg:h-full lg:overflow-hidden">
 
         {/* ── Header bar ───────────────────────────────────────────── */}
         <div className="flex items-center gap-3 shrink-0 flex-wrap">
@@ -919,17 +921,17 @@ function ResultDashboard({ result, taskId }: { result: AnalysisResult; taskId: s
         </div>
 
         {/* ── Main grid ────────────────────────────────────────────── */}
-        <div className="grid grid-cols-1 xl:grid-cols-[420px_1fr] gap-3 xl:flex-1 xl:min-h-0 xl:overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-[420px_1fr] gap-3 lg:flex-1 lg:min-h-0 lg:overflow-hidden">
 
           {/* ── Left column: image + audio ───────────────────────── */}
           <div
-            className="flex flex-col gap-3 xl:overflow-hidden"
+            className="flex flex-col gap-3 lg:overflow-hidden"
             role="region"
             aria-label="Analysis image"
           >
             {/* Image with SVG bbox overlay */}
             <div
-              className="relative border border-white/10 bg-black/20 overflow-hidden min-h-[280px] xl:flex-1 xl:min-h-0"
+              className="relative border border-white/10 bg-black/20 overflow-hidden min-h-[280px] lg:flex-1 lg:min-h-0"
               style={{ borderRadius: 'calc(var(--theme-radius, 28px) - 4px)' }}
             >
               {result.annotated_image_url ? (
@@ -982,12 +984,12 @@ function ResultDashboard({ result, taskId }: { result: AnalysisResult; taskId: s
 
           {/* ── Right column: data cards + stories ──────────────── */}
           <div
-            className="flex flex-col gap-3 xl:overflow-hidden"
+            className="flex flex-col gap-3 lg:overflow-hidden"
             role="region"
             aria-label="Analysis results"
           >
             {/* Row 1 — compact: Objects + Emotions */}
-            <div className="grid grid-cols-2 gap-3 shrink-0 h-[88px]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 shrink-0 h-auto sm:h-[88px]">
 
               <MiniCard
                 icon={Layers}
@@ -1042,7 +1044,7 @@ function ResultDashboard({ result, taskId }: { result: AnalysisResult; taskId: s
             </div>
 
             {/* Row 2 — auto-height: Text (OCR) + Scene (shrinks when content is short) */}
-            <div className="grid grid-cols-2 gap-3 shrink-0">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 shrink-0">
 
               <MiniCard
                 icon={ScanText}
@@ -1115,7 +1117,7 @@ function ResultDashboard({ result, taskId }: { result: AnalysisResult; taskId: s
         </div>
 
         {/* Mobile-only footer links */}
-        <div className="flex gap-3 xl:hidden shrink-0 pt-1 pb-2">
+        <div className="flex gap-3 lg:hidden shrink-0 pt-1 pb-2">
           <Link
             to="/analyse"
             className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl border border-white/10 bg-white/[0.03] text-slate-300 hover:bg-white/[0.06] text-sm font-medium transition-colors"
