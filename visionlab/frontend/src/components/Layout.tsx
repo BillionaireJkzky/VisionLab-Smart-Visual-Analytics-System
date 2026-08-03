@@ -11,6 +11,7 @@ import {
   Settings,
   Sparkles,
   X,
+  Menu,
   Palette,
   Type,
   LayoutGrid,
@@ -636,6 +637,7 @@ export default function Layout() {
 
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [activeTab, setActiveTab]       = useState<SettingsTab>('theme')
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
 
   const [uiSettings, setUiSettings] = useState<UiSettings>(() => {
     try {
@@ -729,38 +731,61 @@ export default function Layout() {
         <div className="animate-aurora absolute bottom-1/3 right-1/3 w-[360px] h-[360px] rounded-full bg-fuchsia-600/[0.07] blur-[90px]" />
       </div>
 
+      {mobileNavOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-black/60 lg:hidden"
+          onClick={() => setMobileNavOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
       <aside
-        className="relative z-10 w-72 shrink-0 border-r border-white/[0.06] flex flex-col shadow-2xl"
+        className={clsx(
+          'fixed inset-y-0 left-0 z-40 w-72 shrink-0 border-r border-white/[0.06] flex flex-col shadow-2xl',
+          'transition-transform duration-300 ease-in-out lg:static lg:z-10 lg:translate-x-0',
+          mobileNavOpen ? 'translate-x-0' : '-translate-x-full',
+        )}
         aria-label="Main navigation"
         style={{ background: dm.sidebar, backdropFilter: 'blur(40px) saturate(180%)', WebkitBackdropFilter: 'blur(40px) saturate(180%)' }}
       >
         <div className="px-5 py-5 border-b border-white/[0.06]">
-          <div className="flex items-center gap-3.5">
-            <div className="relative">
-              <div
-                className="absolute inset-0 rounded-2xl blur-xl animate-breathe"
-                style={{ backgroundColor: `${accent}50` }}
-              />
-              <div
-                className="relative w-10 h-10 rounded-2xl flex items-center justify-center shadow-lg"
-                style={{
-                  background: `linear-gradient(135deg, ${accent}, #3b82f6 55%, #a855f7)`,
-                  boxShadow:  `0 4px 20px ${accent}45`,
-                }}
-              >
-                <Eye className="w-5 h-5 text-white" aria-hidden="true" />
+          <div className="flex items-center justify-between gap-3.5">
+            <div className="flex items-center gap-3.5 min-w-0">
+              <div className="relative">
+                <div
+                  className="absolute inset-0 rounded-2xl blur-xl animate-breathe"
+                  style={{ backgroundColor: `${accent}50` }}
+                />
+                <div
+                  className="relative w-10 h-10 rounded-2xl flex items-center justify-center shadow-lg"
+                  style={{
+                    background: `linear-gradient(135deg, ${accent}, #3b82f6 55%, #a855f7)`,
+                    boxShadow:  `0 4px 20px ${accent}45`,
+                  }}
+                >
+                  <Eye className="w-5 h-5 text-white" aria-hidden="true" />
+                </div>
+              </div>
+
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <p className="font-display font-bold text-white leading-tight tracking-tight text-[15px]">
+                    VisionLab
+                  </p>
+                  <Sparkles className="w-3 h-3" aria-hidden="true" style={{ color: accent }} />
+                </div>
+                <p className="text-[11px] text-slate-500 mt-0.5">Smart Visual Analytics</p>
               </div>
             </div>
 
-            <div>
-              <div className="flex items-center gap-1.5">
-                <p className="font-display font-bold text-white leading-tight tracking-tight text-[15px]">
-                  VisionLab
-                </p>
-                <Sparkles className="w-3 h-3" aria-hidden="true" style={{ color: accent }} />
-              </div>
-              <p className="text-[11px] text-slate-500 mt-0.5">Smart Visual Analytics</p>
-            </div>
+            <button
+              type="button"
+              onClick={() => setMobileNavOpen(false)}
+              className="lg:hidden w-11 h-11 rounded-xl flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/[0.06] transition-colors shrink-0"
+              aria-label="Close navigation menu"
+            >
+              <X className="w-4 h-4" aria-hidden="true" />
+            </button>
           </div>
         </div>
 
@@ -791,6 +816,7 @@ export default function Layout() {
             <NavLink
               key={to}
               to={to}
+              onClick={() => setMobileNavOpen(false)}
               className={({ isActive }) =>
                 clsx(
                   'group flex items-center gap-3 px-3 py-2.5 text-sm font-medium transition-all duration-200 border',
@@ -820,6 +846,7 @@ export default function Layout() {
           {user?.role === 'admin' && (
             <NavLink
               to="/admin"
+              onClick={() => setMobileNavOpen(false)}
               className={({ isActive }) =>
                 clsx(
                   'group flex items-center gap-3 px-3 py-2.5 text-sm font-medium transition-all duration-200 border',
@@ -874,7 +901,30 @@ export default function Layout() {
         </div>
       </aside>
 
-      <main id="main-content" className="relative z-10 flex-1 overflow-hidden flex flex-col" tabIndex={-1}>
+      <main id="main-content" className="relative z-10 flex-1 min-w-0 overflow-hidden flex flex-col" tabIndex={-1}>
+        <div
+          className="lg:hidden flex items-center gap-3 px-4 py-3 border-b border-white/[0.06] shrink-0"
+          style={{ background: dm.sidebar, backdropFilter: 'blur(40px) saturate(180%)', WebkitBackdropFilter: 'blur(40px) saturate(180%)' }}
+        >
+          <button
+            type="button"
+            onClick={() => setMobileNavOpen(true)}
+            className="w-11 h-11 -ml-1 rounded-2xl flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/[0.06] transition-colors shrink-0"
+            aria-label="Open navigation menu"
+          >
+            <Menu className="w-5 h-5" aria-hidden="true" />
+          </button>
+          <div className="flex items-center gap-2 min-w-0">
+            <div
+              className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
+              style={{ background: `linear-gradient(135deg, ${accent}, #3b82f6 55%, #a855f7)` }}
+            >
+              <Eye className="w-4 h-4 text-white" aria-hidden="true" />
+            </div>
+            <p className="font-display font-bold text-white text-sm truncate">VisionLab</p>
+          </div>
+        </div>
+
         <div className="flex-1 min-h-0 overflow-y-auto p-6 md:p-8">
           <Outlet />
         </div>
