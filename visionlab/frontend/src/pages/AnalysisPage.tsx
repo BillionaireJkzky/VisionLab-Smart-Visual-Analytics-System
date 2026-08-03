@@ -411,7 +411,7 @@ export default function AnalysisPage() {
             role="button"
             aria-label="Upload image. Drag and drop or click to select."
           >
-            <input {...getInputProps()} aria-label="Image file input" />
+            <input {...getInputProps({ capture: 'environment' })} aria-label="Image file input" />
 
             {preview ? (
               <div className="grid grid-cols-1 lg:grid-cols-[0.95fr_1.05fr] gap-8 items-center">

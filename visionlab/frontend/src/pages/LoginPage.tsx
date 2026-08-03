@@ -130,7 +130,7 @@ export default function LoginPage() {
                     onBlur={() => setFocusField(null)}
                     onChange={(e) => setUsername(e.target.value)}
                     placeholder="Enter your username"
-                    className="w-full bg-transparent px-4 py-3.5 text-[15px] text-white placeholder:text-slate-600 outline-none rounded-2xl"
+                    className="w-full bg-transparent px-4 py-3.5 text-base text-white placeholder:text-slate-600 outline-none rounded-2xl"
                   />
                 </div>
               </div>
@@ -156,12 +156,12 @@ export default function LoginPage() {
                     onBlur={() => setFocusField(null)}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••••••"
-                    className="w-full bg-transparent px-4 py-3.5 pr-12 text-[15px] text-white placeholder:text-slate-600 outline-none rounded-2xl tracking-wider"
+                    className="w-full bg-transparent px-4 py-3.5 pr-12 text-base text-white placeholder:text-slate-600 outline-none rounded-2xl tracking-wider"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPw(!showPw)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"
+                    className="absolute right-0.5 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center text-slate-400 hover:text-slate-200 transition-colors"
                     aria-label={showPw ? 'Hide password' : 'Show password'}
                   >
                     {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
