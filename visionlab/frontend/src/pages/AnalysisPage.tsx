@@ -32,7 +32,7 @@ import clsx from 'clsx'
 const DETECTOR_MODELS = [
   { value: 'fast', label: 'Fast', desc: 'YOLO11 Nano (yolo11n.pt)' },
   { value: 'balanced', label: 'Balanced', desc: 'YOLO11 Small (yolo11s.pt)' },
-  { value: 'advanced', label: 'Advanced', desc: 'RT-DETR Large (rtdetr-l.pt)' },
+  { value: 'advanced', label: 'Advanced', desc: 'YOLO11 Small (yolo11s.pt)' },
 ]
 
 const SCENE_MODELS = [

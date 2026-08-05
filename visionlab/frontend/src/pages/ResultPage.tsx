@@ -58,7 +58,7 @@ const ORDERED_STEPS: (keyof TaskStepDetails)[] = [
   'detection', 'emotion', 'ocr', 'scene', 'story', 'tts', 'quiz',
 ]
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8001'
 
 // ── Utility functions ─────────────────────────────────────────────────────
 
