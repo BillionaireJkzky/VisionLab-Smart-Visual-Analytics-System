@@ -15,7 +15,7 @@ Performance changes from the previous version:
 Three selectable detection tiers:
 - fast      -> yolo11n.pt
 - balanced  -> yolo11s.pt
-- advanced  -> rtdetr-l.pt
+- advanced  ->  yolo11s.pt
 """
 from __future__ import annotations
 
@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 MODEL_PATHS = {
     "fast": "yolo11n.pt",
     "balanced": "yolo11s.pt",
-    "advanced": "rtdetr-l.pt",
+    "advanced": "yolo11s.pt",
 }
 
 # Resize hint for YOLO — 640 is the training size; larger doesn't help accuracy.
@@ -78,12 +78,10 @@ def _get_model(model_key: str = "balanced") -> YOLO:
     model = YOLO(model_path)
     model.to(device)
 
-    if _use_half:
-        # fp16 weights cut memory traffic in half on supported GPUs.
-        try:
-            model.model.half()
-        except Exception as exc:  # noqa: BLE001
-            logger.warning("Could not switch model to fp16: %s", exc)
+    # fp16 is requested per-call via `half=` on predict() instead of converting
+    # weights here — calling model.model.half() before Ultralytics fuses
+    # Conv+BatchNorm on first inference causes a dtype mismatch crash
+    # (fused conv ends up half while its batchnorm buffers are still float32).
 
     _models[model_key] = model
     logger.info("Detection model loaded: %s (%s) on %s", model_key, model_path, device)
