@@ -26,6 +26,10 @@ audio_outputs/*.mp3
 image_outputs/*.jpg
 image_outputs/*.png
 
+# ── Evaluation harness (test datasets + generated figures, not source) ──
+backend/evaluation/datasets/
+backend/evaluation/results/
+
 # ── IDE / OS ──
 .idea/
 .vscode/

@@ -1,0 +1,19 @@
+# Evaluation-only dependencies — NOT required to run the web app.
+# Install with: pip install -r evaluation/requirements-eval.txt
+# (install the app's own requirements.txt first — these scripts import the
+# real service modules from app/services/, so torch/ultralytics/deepface/
+# easyocr etc. must already be present.)
+#
+# pycocotools is deliberately NOT listed here: it requires a C build step
+# that is unreliable on Windows without Visual C++ build tools. evaluate_detection.py
+# implements COCO-style mAP@0.5 / mAP@0.5:0.95 directly (see the module
+# docstring there for the exact algorithm) so no compiled dependency is needed.
+
+scikit-learn==1.5.1
+seaborn==0.13.2
+jiwer==3.0.4
+# matplotlib and pandas are pulled in transitively by ultralytics already —
+# minimum-version constraints instead of exact pins so this install doesn't
+# silently downgrade whatever version is already satisfying the app.
+matplotlib>=3.9.0
+pandas>=2.2.2
