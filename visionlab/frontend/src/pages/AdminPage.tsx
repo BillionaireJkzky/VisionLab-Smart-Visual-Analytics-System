@@ -8,35 +8,29 @@ import {
   Clock3,
   TrendingUp,
   Activity,
-  Sparkles,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { adminApi, getApiErrorMessage } from '../services/api'
 import type { AdminAnalyticsResponse } from '../types/api'
 import { SurfaceCard } from '../components/ui'
-import clsx from 'clsx'
 
 function StatCard({
   label,
   value,
   icon: Icon,
-  accentClass,
 }: {
   label: string
   value: string | number
   icon: ComponentType<{ className?: string }>
-  accentClass: string
 }) {
   return (
     <SurfaceCard>
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs uppercase tracking-[0.16em] text-slate-400">{label}</p>
-          <p className={clsx('mt-3 text-4xl font-bold tracking-tight', accentClass)}>{value}</p>
+          <p className="text-[11px] font-mono uppercase tracking-[0.14em] text-ink-faint">{label}</p>
+          <p className="mt-3 text-3xl font-mono font-semibold tracking-tight text-ink">{value}</p>
         </div>
-        <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
-          <Icon className={clsx('w-5 h-5', accentClass)} />
-        </div>
+        <Icon className="w-4 h-4 text-ink-muted shrink-0 mt-1" aria-hidden="true" />
       </div>
     </SurfaceCard>
   )
@@ -73,12 +67,10 @@ export default function AdminPage() {
     return (
       <div className="flex items-center justify-center py-24">
         <div className="flex flex-col items-center gap-4" role="status" aria-live="polite" aria-busy="true">
-          <div className="w-16 h-16 rounded-3xl border border-white/10 bg-white/[0.04] flex items-center justify-center">
-            <Loader2 className="w-8 h-8 text-cyan-300 animate-spin" />
-          </div>
+          <Loader2 className="w-6 h-6 text-ink-muted animate-spin" />
           <div className="text-center">
-            <p className="text-white font-medium">Loading admin analytics</p>
-            <p className="text-sm text-slate-400 mt-1">Please wait a moment...</p>
+            <p className="text-ink font-medium">Loading admin analytics</p>
+            <p className="text-sm text-ink-muted mt-1">Please wait a moment...</p>
           </div>
         </div>
       </div>
@@ -87,13 +79,10 @@ export default function AdminPage() {
 
   if (errorMessage || !analytics) {
     return (
-      <div
-        className="border border-rose-400/20 bg-rose-500/10 text-center"
-        style={{ borderRadius: 'var(--theme-radius)' }}
-      >
+      <div className="border border-line-strong rounded-lg bg-negative-subtle text-center">
         <div className="py-16 px-6">
-          <XCircle className="w-10 h-10 text-rose-400 mx-auto mb-3" />
-          <p className="text-white font-medium">{errorMessage ?? 'Failed to load analytics.'}</p>
+          <XCircle className="w-8 h-8 text-negative mx-auto mb-3" />
+          <p className="text-ink font-medium">{errorMessage ?? 'Failed to load analytics.'}</p>
         </div>
       </div>
     )
@@ -106,55 +95,47 @@ export default function AdminPage() {
   const maxCount = analytics.top_detected_objects[0]?.count ?? 1
 
   return (
-    <div className="max-w-5xl mx-auto animate-fade-in space-y-8">
-      <section
-        className="relative overflow-hidden border border-white/10 bg-gradient-to-br from-cyan-500/10 via-blue-500/10 to-fuchsia-500/10 shadow-2xl"
-        style={{ borderRadius: 'var(--theme-radius)' }}
-      >
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-14 right-0 w-72 h-72 rounded-full bg-cyan-400/10 blur-3xl" />
-          <div className="absolute bottom-0 left-1/4 w-72 h-72 rounded-full bg-fuchsia-500/10 blur-3xl" />
+    <div className="max-w-5xl mx-auto animate-fade-in space-y-10">
+      <header className="pb-8 border-b border-line">
+        <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-ink-faint mb-4">
+          Admin
+        </p>
+        <div className="flex items-center gap-3">
+          <ShieldCheck className="w-5 h-5 text-ink" aria-hidden="true" />
+          <h1 className="font-display text-3xl md:text-4xl font-medium text-ink">System analytics</h1>
         </div>
-        <div className="relative z-10 p-6 md:p-8">
-          <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-cyan-200 mb-4">
-            <Sparkles className="w-3.5 h-3.5" />
-            Admin
-          </div>
-          <div className="flex items-center gap-3">
-            <ShieldCheck className="w-6 h-6 text-cyan-300" aria-hidden="true" />
-            <h1 className="text-3xl md:text-4xl font-bold text-white">System Analytics</h1>
-          </div>
-          <p className="mt-3 text-slate-300 leading-7">
-            Platform-wide usage statistics across all users and analyses.
-          </p>
-        </div>
-      </section>
+        <p className="mt-3 text-ink-muted leading-7">
+          Platform-wide usage statistics across all users and analyses.
+        </p>
+      </header>
 
-      <section className="grid grid-cols-2 md:grid-cols-3 gap-5">
-        <StatCard label="Total Users"     value={analytics.total_users}     icon={Users}        accentClass="text-cyan-300" />
-        <StatCard label="Total Analyses"  value={analytics.total_tasks}     icon={TrendingUp}   accentClass="text-blue-300" />
-        <StatCard label="Completed"       value={analytics.completed_tasks} icon={CheckCircle2} accentClass="text-emerald-300" />
-        <StatCard label="Failed"          value={analytics.failed_tasks}    icon={XCircle}      accentClass="text-rose-300" />
-        <StatCard label="Avg Processing"  value={avgProcessing}             icon={Clock3}       accentClass="text-amber-300" />
-        <StatCard label="Last 24 Hours"   value={analytics.tasks_last_24h}  icon={Activity}     accentClass="text-fuchsia-300" />
+      <section className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <StatCard label="Total users"     value={analytics.total_users}     icon={Users} />
+        <StatCard label="Total analyses"  value={analytics.total_tasks}     icon={TrendingUp} />
+        <StatCard label="Completed"       value={analytics.completed_tasks} icon={CheckCircle2} />
+        <StatCard label="Failed"          value={analytics.failed_tasks}    icon={XCircle} />
+        <StatCard label="Avg processing"  value={avgProcessing}             icon={Clock3} />
+        <StatCard label="Last 24 hours"   value={analytics.tasks_last_24h}  icon={Activity} />
       </section>
 
       {analytics.top_detected_objects.length > 0 && (
         <SurfaceCard padded={false} as="section">
-          <div className="p-5 md:p-6 border-b border-white/10">
-            <h2 className="text-xl font-bold text-white">Top Detected Objects</h2>
-            <p className="text-sm text-slate-400 mt-1">Most frequently detected labels across completed analyses.</p>
+          <div className="p-5 md:p-6 border-b border-line">
+            <h2 className="text-lg font-semibold text-ink">Top detected objects</h2>
+            <p className="text-sm text-ink-muted mt-1">Most frequently detected labels across completed analyses.</p>
           </div>
           <div className="p-5 md:p-6 space-y-4">
             {analytics.top_detected_objects.map(({ label, count }, i) => {
               const pct = Math.round((count / maxCount) * 100)
               return (
                 <div key={label} className="flex items-center gap-4">
-                  <span className="w-5 text-xs text-slate-500 text-right shrink-0">{i + 1}</span>
-                  <span className="w-28 text-sm font-medium text-white capitalize shrink-0">{label}</span>
-                  <div className="flex-1 bg-white/[0.06] rounded-full h-2 overflow-hidden">
+                  <span className="w-5 text-xs font-mono text-ink-faint text-right shrink-0">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <span className="w-28 text-sm font-medium text-ink capitalize shrink-0">{label}</span>
+                  <div className="flex-1 bg-line rounded-full h-1.5 overflow-hidden">
                     <div
-                      className="bg-gradient-to-r from-cyan-400 to-blue-500 h-2 rounded-full transition-all"
+                      className="bg-ink h-1.5 rounded-full transition-all"
                       style={{ width: `${pct}%` }}
                       role="progressbar"
                       aria-valuenow={pct}
@@ -163,7 +144,7 @@ export default function AdminPage() {
                       aria-label={`${label}: ${count} detections`}
                     />
                   </div>
-                  <span className="text-xs text-slate-400 w-8 text-right shrink-0">{count}</span>
+                  <span className="text-xs font-mono text-ink-faint w-8 text-right shrink-0">{count}</span>
                 </div>
               )
             })}

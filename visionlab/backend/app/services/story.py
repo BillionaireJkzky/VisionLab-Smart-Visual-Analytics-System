@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import logging
 import time
+from concurrent.futures import ThreadPoolExecutor
+from functools import partial
 from typing import List, Optional
 
 from app.core.config import settings
@@ -237,6 +239,51 @@ def enrich_scene_description(
     return raw_caption
 
 
+def _generate_story_for_type(
+    story_type: str,
+    detections: List[dict],
+    emotions: List[dict],
+    scene: Optional[dict],
+    ocr: Optional[dict],
+    client,
+    model_name: str,
+    fallback_model_name: str,
+) -> dict:
+    prompt = _build_prompt(detections, emotions, scene, ocr, story_type)
+    full_prompt = f"{_SYSTEM_PROMPT}\n\n{prompt}"
+
+    content: Optional[str] = None
+    last_error: Optional[Exception] = None
+
+    for attempt_index, current_model in enumerate(
+        [model_name, fallback_model_name], start=1
+    ):
+        if not current_model:
+            continue
+        try:
+            t0 = time.time()
+            content = _generate_one_story(client, current_model, full_prompt)
+            logger.info(
+                "Story ok type=%s model=%s in %.2fs",
+                story_type, current_model, time.time() - t0,
+            )
+            break
+        except Exception as exc:
+            last_error = exc
+            logger.warning(
+                "Story failed type=%s model=%s attempt=%d: %s",
+                story_type, current_model, attempt_index, str(exc),
+            )
+            if attempt_index == 1:
+                time.sleep(0.5)
+
+    if not content:
+        error_text = str(last_error) if last_error else "unknown"
+        content = _error_placeholder(error_text)
+
+    return {"story_type": story_type, "content": content.strip()}
+
+
 def generate_stories(
     detections: List[dict],
     emotions: List[dict],
@@ -258,40 +305,18 @@ def generate_stories(
             for st in story_types
         ]
 
-    stories: List[dict] = []
-    for story_type in story_types:
-        prompt = _build_prompt(detections, emotions, scene, ocr, story_type)
-        full_prompt = f"{_SYSTEM_PROMPT}\n\n{prompt}"
+    worker = partial(
+        _generate_story_for_type,
+        detections=detections, emotions=emotions, scene=scene, ocr=ocr,
+        client=client, model_name=model_name, fallback_model_name=fallback_model_name,
+    )
 
-        content: Optional[str] = None
-        last_error: Optional[Exception] = None
+    if len(story_types) == 1:
+        return [worker(story_types[0])]
 
-        for attempt_index, current_model in enumerate(
-            [model_name, fallback_model_name], start=1
-        ):
-            if not current_model:
-                continue
-            try:
-                t0 = time.time()
-                content = _generate_one_story(client, current_model, full_prompt)
-                logger.info(
-                    "Story ok type=%s model=%s in %.2fs",
-                    story_type, current_model, time.time() - t0,
-                )
-                break
-            except Exception as exc:
-                last_error = exc
-                logger.warning(
-                    "Story failed type=%s model=%s attempt=%d: %s",
-                    story_type, current_model, attempt_index, str(exc),
-                )
-                if attempt_index == 1:
-                    time.sleep(0.5)
-
-        if not content:
-            error_text = str(last_error) if last_error else "unknown"
-            content = _error_placeholder(error_text)
-
-        stories.append({"story_type": story_type, "content": content.strip()})
-
-    return stories
+    # Each Gemini call is network I/O (releases the GIL while waiting), so
+    # threads give real wall-clock parallelism here without needing the
+    # prefork pool — 3 story types run in ~1 call's worth of latency instead
+    # of 3x. executor.map preserves story_types order in the result list.
+    with ThreadPoolExecutor(max_workers=len(story_types)) as executor:
+        return list(executor.map(worker, story_types))

@@ -31,8 +31,40 @@ class UserOut(BaseModel):
     role: str
     is_active: bool
     created_at: datetime
+    settings: Dict[str, Any] = Field(default_factory=dict)
 
     model_config = {"from_attributes": True}
+
+
+class UserSettingsUpdate(BaseModel):
+    """
+    Partial update for a user's UI customisation settings. Every field is
+    optional (only fields present in the request get merged into the stored
+    settings blob) and constrained to the curated option set — this is a
+    deliberately closed customisation surface, not a free-form theme editor.
+    """
+
+    schema_version: int = Field(default=1, alias="_v")
+
+    mode: Optional[Literal["light", "dark", "system"]] = None
+    accent: Optional[Literal["mono", "clay", "taupe", "ochre", "plum", "charcoal"]] = None
+
+    typography: Optional[Literal["editorial", "clean"]] = None
+    font_size: Optional[Literal[14, 16, 18]] = None
+    reading_comfort: Optional[Literal["normal", "relaxed"]] = None
+
+    density: Optional[Literal["comfortable", "compact"]] = None
+    sidebar: Optional[Literal["expanded", "collapsed"]] = None
+    content_width: Optional[Literal["standard", "wide"]] = None
+
+    radius: Optional[Literal["rounded", "sharp"]] = None
+    separation: Optional[Literal["border", "shadow"]] = None
+
+    reduce_motion: Optional[bool] = None
+    high_contrast: Optional[bool] = None
+    underline_links: Optional[bool] = None
+
+    model_config = {"populate_by_name": True}
 
 
 class AnalysisRequest(BaseModel):

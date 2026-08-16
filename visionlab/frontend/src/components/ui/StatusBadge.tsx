@@ -2,27 +2,27 @@ import clsx from 'clsx'
 import type { TaskStatus, TaskStepStatus } from '../../types/api'
 
 const TASK_STATUS_STYLES: Record<string, string> = {
-  pending:    'bg-amber-500/15  text-amber-300  border border-amber-400/20',
-  processing: 'bg-cyan-500/15   text-cyan-300   border border-cyan-400/20',
-  completed:  'bg-emerald-500/15 text-emerald-300 border border-emerald-400/20',
-  failed:     'bg-rose-500/15   text-rose-300   border border-rose-400/20',
+  pending:    'bg-caution-subtle text-caution border-caution',
+  processing: 'bg-accent-subtle text-accent border-accent',
+  completed:  'bg-positive-subtle text-positive border-positive',
+  failed:     'bg-negative-subtle text-negative border-negative',
 }
 
 const STEP_STATUS_STYLES: Record<string, string> = {
-  waiting: 'bg-slate-500/15  text-slate-300  border border-white/10',
-  running: 'bg-cyan-500/15   text-cyan-300   border border-cyan-400/20',
-  done:    'bg-emerald-500/15 text-emerald-300 border border-emerald-400/20',
-  skipped: 'bg-amber-500/15  text-amber-300  border border-amber-400/20',
-  failed:  'bg-rose-500/15   text-rose-300   border border-rose-400/20',
+  waiting: 'bg-paper text-ink-muted border-line-strong',
+  running: 'bg-accent-subtle text-accent border-accent',
+  done:    'bg-positive-subtle text-positive border-positive',
+  skipped: 'bg-caution-subtle text-caution border-caution',
+  failed:  'bg-negative-subtle text-negative border-negative',
 }
 
-const FALLBACK = 'bg-slate-500/15 text-slate-300 border border-white/10'
+const FALLBACK = 'bg-paper text-ink-muted border-line-strong'
 
 export function StatusBadge({ status }: { status: TaskStatus | string }) {
   return (
     <span
       className={clsx(
-        'inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold capitalize',
+        'inline-flex items-center rounded border px-2.5 py-1 text-xs font-mono font-medium lowercase',
         TASK_STATUS_STYLES[status] ?? FALLBACK,
       )}
     >
@@ -35,7 +35,7 @@ export function StepStatusBadge({ status }: { status: TaskStepStatus | string })
   return (
     <span
       className={clsx(
-        'inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold capitalize',
+        'inline-flex items-center rounded border px-2 py-0.5 text-[11px] font-mono font-medium lowercase',
         STEP_STATUS_STYLES[status] ?? FALLBACK,
       )}
     >

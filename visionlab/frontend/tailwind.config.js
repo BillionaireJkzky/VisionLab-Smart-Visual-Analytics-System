@@ -5,127 +5,76 @@ export default {
   theme: {
     extend: {
       colors: {
-        void: {
-          950: '#010408',
-          900: '#020a14',
-          800: '#060f1d',
-          700: '#0b1929',
-          600: '#112035',
+        // Every color here resolves through a CSS custom property (defined
+        // in src/styles/index.css) instead of a static hex value. This is
+        // what makes live theme switching (mode/accent/etc, see useSettings)
+        // possible without touching component code — Tailwind still
+        // generates `bg-paper`/`text-ink`/etc. utility classes as normal,
+        // they just compile to `var(--color-x)` lookups. The DEFAULT values
+        // of those custom properties (in index.css :root) are the unchanged
+        // monochrome warm-neutral system — no chromatic accent by default.
+        paper: {
+          DEFAULT: 'var(--color-bg)',
+          raised:  'var(--color-surface)',
         },
-        aurora: {
-          300: '#67e8f9',
-          400: '#22d3ee',
-          500: '#00b8d9',
-          600: '#0e7490',
+        ink: {
+          DEFAULT:  'var(--color-text)',
+          muted:    'var(--color-text-muted)',
+          faint:    'var(--color-text-faint)', // reserved for large text/icons only
+          onaccent: 'var(--color-text-onaccent)',
         },
-        plasma: {
-          300: '#c4b5fd',
-          400: '#a78bfa',
-          500: '#8b5cf6',
-          600: '#7c3aed',
+        line: {
+          DEFAULT: 'var(--color-border)',
+          strong:  'var(--color-border-strong)',
         },
-        nebula: {
-          300: '#f5d0fe',
-          400: '#e879f9',
-          500: '#d946ef',
-          600: '#c026d3',
+        // "accent" = the primary-action color. Weight by default (monochrome),
+        // optionally a curated hue (see .accent-* classes in index.css).
+        accent: {
+          DEFAULT: 'var(--color-primary)',
+          hover:   'var(--color-primary-hover)',
+          active:  'var(--color-primary-active)',
+          subtle:  'var(--color-primary-subtle)',
         },
-        primary: {
-          50:  '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
-          800: '#1e40af',
-          900: '#1e3a8a',
-        },
-        calm: {
-          50:  '#f0fdf4',
-          100: '#dcfce7',
-          200: '#bbf7d0',
-          300: '#86efac',
-          400: '#4ade80',
-          500: '#22c55e',
-        },
+        // Status is conveyed by weight/darkness + the mono text label
+        // itself (e.g. "failed"), never by hue, in the default theme.
+        positive: { DEFAULT: 'var(--color-success)', subtle: 'var(--color-success-subtle)' },
+        caution:  { DEFAULT: 'var(--color-warning)', subtle: 'var(--color-warning-subtle)' },
+        negative: { DEFAULT: 'var(--color-error)',   subtle: 'var(--color-error-subtle)' },
       },
       fontFamily: {
-        sans:    ['"Space Grotesk"', 'Inter', 'system-ui', 'sans-serif'],
-        display: ['Outfit', 'Nunito', 'sans-serif'],
+        // Editorial serif for headings by default — deliberately not another
+        // AI-SaaS grotesk-on-dark template. Driven by a CSS var so the
+        // Typography "Clean" setting can swap it for the sans font live
+        // (see .font-clean in index.css) without a rebuild.
+        display: ['var(--font-display)', 'Fraunces', 'Georgia', 'serif'],
+        sans:    ['Inter', 'system-ui', 'sans-serif'],
+        // Mono is a deliberate technical signature — used for every
+        // confidence %, step timing, model name, and ID in the product.
         mono:    ['"JetBrains Mono"', '"Fira Code"', 'monospace'],
-        inter:   ['Inter', '"Space Grotesk"', 'system-ui', 'sans-serif'],
+      },
+      borderRadius: {
+        // Driven by CSS vars so the Surface & Shape "Sharp" setting can
+        // flatten these live (see .radius-sharp in index.css). Defaults
+        // match the unchanged current values.
+        sm: 'var(--radius-sm)',
+        DEFAULT: 'var(--radius-default)',
+        md: 'var(--radius-default)',
+        lg: 'var(--radius-lg)',
+      },
+      boxShadow: {
+        // One subtle lift only. No glow, ever.
+        card:   'var(--shadow-card)',
+        raised: 'var(--shadow-raised)',
       },
       animation: {
-        'fade-in':      'fadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) both',
-        'slide-up':     'slideUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) both',
-        'aurora':       'aurora 14s ease-in-out infinite',
-        'aurora-slow':  'aurora 22s ease-in-out infinite reverse',
-        'aurora-alt':   'auroraAlt 18s ease-in-out infinite',
-        'shimmer':      'shimmer 2.5s linear infinite',
-        'glow-pulse':   'glowPulse 3.5s ease-in-out infinite',
-        'float':        'float 7s ease-in-out infinite',
-        'float-slow':   'float 11s ease-in-out infinite reverse',
-        'float-soft':   'floatSoft 6s ease-in-out infinite',
-        'breathe':      'breathe 4s ease-in-out infinite',
-        'pulse-slow':   'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        // Minimal, functional only.
+        'fade-in': 'fadeIn 0.25s ease-out both',
       },
       keyframes: {
         fadeIn: {
-          '0%':   { opacity: '0', transform: 'translateY(12px)' },
-          '100%': { opacity: '1', transform: 'translateY(0)' },
+          '0%':   { opacity: '0' },
+          '100%': { opacity: '1' },
         },
-        slideUp: {
-          '0%':   { opacity: '0', transform: 'translateY(24px)' },
-          '100%': { opacity: '1', transform: 'translateY(0)' },
-        },
-        aurora: {
-          '0%, 100%': { transform: 'translate(0%, 0%) scale(1)',    opacity: '0.6' },
-          '25%':       { transform: 'translate(4%, -5%) scale(1.07)', opacity: '0.8' },
-          '50%':       { transform: 'translate(-3%, 4%) scale(1.02)', opacity: '0.5' },
-          '75%':       { transform: 'translate(-5%, -2%) scale(0.96)', opacity: '0.7' },
-        },
-        auroraAlt: {
-          '0%, 100%': { transform: 'translate(0%, 0%) scale(1)',    opacity: '0.4' },
-          '33%':       { transform: 'translate(-4%, 3%) scale(1.09)', opacity: '0.65' },
-          '66%':       { transform: 'translate(3%, -5%) scale(0.93)', opacity: '0.45' },
-        },
-        shimmer: {
-          '0%':   { backgroundPosition: '-400px center' },
-          '100%': { backgroundPosition:  '400px center' },
-        },
-        glowPulse: {
-          '0%, 100%': { opacity: '0.4' },
-          '50%':       { opacity: '1' },
-        },
-        float: {
-          '0%, 100%': { transform: 'translateY(0px)' },
-          '50%':       { transform: 'translateY(-10px)' },
-        },
-        floatSoft: {
-          '0%, 100%': { transform: 'translateY(0px)' },
-          '50%':       { transform: 'translateY(-5px)' },
-        },
-        breathe: {
-          '0%, 100%': { transform: 'scale(1)',    opacity: '0.55' },
-          '50%':       { transform: 'scale(1.06)', opacity: '1' },
-        },
-      },
-      boxShadow: {
-        'aurora':    '0 0 40px rgba(34,211,238,0.25), 0 0 80px rgba(34,211,238,0.1)',
-        'aurora-lg': '0 0 60px rgba(34,211,238,0.3), 0 0 120px rgba(34,211,238,0.12)',
-        'plasma':    '0 0 40px rgba(139,92,246,0.25), 0 0 80px rgba(139,92,246,0.1)',
-        'nebula':    '0 0 40px rgba(217,70,239,0.25), 0 0 80px rgba(217,70,239,0.1)',
-        'glow-sm':   '0 0 12px rgba(34,211,238,0.3)',
-        'glow':      '0 0 24px rgba(34,211,238,0.3), 0 0 48px rgba(34,211,238,0.1)',
-        'glow-lg':   '0 0 48px rgba(34,211,238,0.35), 0 0 96px rgba(34,211,238,0.14)',
-        'inner-top': 'inset 0 1px 0 rgba(255,255,255,0.06)',
-      },
-      backdropBlur: {
-        '2xl': '32px',
-        '3xl': '48px',
-        '4xl': '64px',
       },
     },
   },

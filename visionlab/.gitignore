@@ -30,6 +30,11 @@ image_outputs/*.png
 backend/evaluation/datasets/
 backend/evaluation/results/
 
+# ── eval/ module (ground-truth data you provide + generated JSON results) ──
+backend/eval/data/*
+!backend/eval/data/**/.gitkeep
+backend/eval/results/
+
 # ── IDE / OS ──
 .idea/
 .vscode/

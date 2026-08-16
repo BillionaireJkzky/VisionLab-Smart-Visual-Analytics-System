@@ -14,7 +14,6 @@ import {
   ImageIcon,
   X,
   AlertTriangle,
-  Sparkles,
   SlidersHorizontal,
   ChevronDown,
   ChevronUp,
@@ -123,15 +122,6 @@ function formatFileSize(bytes?: number) {
   return `${(bytes / (1024 * 1024)).toFixed(2)} MB`
 }
 
-function SummaryRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-center justify-between gap-3">
-      <span className="text-sm text-slate-400">{label}</span>
-      <span className="text-sm font-medium text-white">{value}</span>
-    </div>
-  )
-}
-
 function PresetButton({
   label,
   desc,
@@ -148,25 +138,22 @@ function PresetButton({
       type="button"
       onClick={onClick}
       className={clsx(
-        'text-left border transition-all duration-200',
+        'text-left border rounded transition-colors duration-150 p-4',
         active
-          ? 'border-cyan-400/30 bg-cyan-400/10'
-          : 'border-white/10 bg-white/[0.03] hover:bg-white/[0.05] hover:border-white/20'
+          ? 'border-ink bg-accent-subtle'
+          : 'border-line bg-paper-raised hover:border-line-strong'
       )}
-      style={{ borderRadius: 'calc(var(--theme-radius, 28px) - 10px)' }}
     >
-      <div className="p-4">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <p className="text-sm font-semibold text-white">{label}</p>
-            <p className="text-xs text-slate-400 mt-1">{desc}</p>
-          </div>
-          {active ? (
-            <span className="w-8 h-8 rounded-xl bg-cyan-400/15 border border-cyan-400/20 flex items-center justify-center shrink-0">
-              <Check className="w-4 h-4 text-cyan-300" />
-            </span>
-          ) : null}
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p className="text-sm font-semibold text-ink">{label}</p>
+          <p className="text-xs text-ink-muted mt-1">{desc}</p>
         </div>
+        {active ? (
+          <span className="w-7 h-7 rounded-full bg-ink flex items-center justify-center shrink-0">
+            <Check className="w-3.5 h-3.5 text-paper" />
+          </span>
+        ) : null}
       </div>
     </button>
   )
@@ -190,40 +177,33 @@ function SelectField({
   onChange: (value: string) => void
 }) {
   return (
-    <div
-      className="border border-white/10 bg-white/[0.03]"
-      style={{ borderRadius: 'calc(var(--theme-radius, 28px) - 10px)' }}
-    >
-      <div className="p-4">
-        <div className="flex items-start gap-3 mb-4">
-          <div className="w-10 h-10 rounded-2xl border border-white/10 bg-white/[0.04] flex items-center justify-center shrink-0">
-            <Icon className="w-4 h-4 text-cyan-300" aria-hidden="true" />
-          </div>
-          <div>
-            <p className="text-sm font-semibold text-white">{label}</p>
-            <p className="text-xs text-slate-400 mt-1">{hint}</p>
-          </div>
+    <div className="border border-line rounded bg-paper-raised p-4">
+      <div className="flex items-start gap-3 mb-4">
+        <Icon className="w-4 h-4 text-ink-muted mt-0.5 shrink-0" aria-hidden="true" />
+        <div>
+          <p className="text-sm font-semibold text-ink">{label}</p>
+          <p className="text-xs text-ink-muted mt-1">{hint}</p>
         </div>
+      </div>
 
-        <div className="relative">
-          <label htmlFor={id} className="sr-only">
-            {label}
-          </label>
-          <select
-            id={id}
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            className="w-full appearance-none rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 pr-10 text-sm text-white outline-none transition focus:border-cyan-400/30"
-          >
-            {options.map((option) => (
-              <option key={option.value} value={option.value} className="text-black">
-                {option.label} — {option.desc}
-              </option>
-            ))}
-          </select>
+      <div className="relative">
+        <label htmlFor={id} className="sr-only">
+          {label}
+        </label>
+        <select
+          id={id}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-full appearance-none rounded border border-line-strong bg-paper-raised px-4 py-3 pr-10 text-sm text-ink outline-none transition-colors focus:border-ink"
+        >
+          {options.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label} — {option.desc}
+            </option>
+          ))}
+        </select>
 
-          <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-        </div>
+        <ChevronDown className="w-4 h-4 text-ink-faint absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
       </div>
     </div>
   )
@@ -350,64 +330,16 @@ export default function AnalysisPage() {
 
   return (
     <div className="max-w-6xl mx-auto animate-fade-in space-y-8">
-      <SurfaceCard padded={false}>
-        <div className="p-7 md:p-9">
-          <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-8 items-start">
-            <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-cyan-200 mb-5">
-                <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
-                Analyse Image
-              </div>
-
-              <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-white leading-tight">
-                Upload once.
-                <br />
-                Understand more.
-              </h1>
-
-              <p className="mt-4 max-w-2xl text-slate-300 leading-7 text-base md:text-lg">
-                A clean workflow for turning any image into structured insight, scene understanding,
-                emotion cues, story output, and learning-ready results.
-              </p>
-            </div>
-
-            <div
-              className="border border-white/10 bg-white/[0.03]"
-              style={{ borderRadius: 'calc(var(--theme-radius, 28px) - 4px)' }}
-            >
-              <div className="p-5">
-                <p className="text-xs uppercase tracking-[0.16em] text-slate-500 mb-4">
-                  Current setup
-                </p>
-
-                <div className="space-y-3">
-                  <SummaryRow label="Preset" value={selectedSummary.preset} />
-                  <SummaryRow label="Detection" value={selectedSummary.detector} />
-                  <SummaryRow label="Scene" value={selectedSummary.scene} />
-                  <SummaryRow label="Emotion" value={selectedSummary.emotion} />
-                  <SummaryRow label="Story" value={selectedSummary.story} />
-                  <SummaryRow label="Difficulty" value={selectedSummary.difficulty} />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </SurfaceCard>
-
       <form onSubmit={handleSubmit} className="space-y-6">
         <SurfaceCard padded={false}>
           <div
             {...getRootProps()}
             className={clsx(
-              'border-2 border-dashed transition-all duration-200 cursor-pointer',
+              'border-2 border-dashed rounded-lg p-8 md:p-10 transition-colors duration-150 cursor-pointer',
               isDragActive
-                ? 'border-cyan-400/50 bg-cyan-400/10'
-                : 'border-transparent hover:bg-white/[0.02]'
+                ? 'border-ink bg-accent-subtle'
+                : 'border-transparent hover:bg-paper'
             )}
-            style={{
-              borderRadius: 'var(--theme-radius, 28px)',
-              padding: 'var(--theme-density, 20px)',
-            }}
             role="button"
             aria-label="Upload image. Drag and drop or click to select."
           >
@@ -419,8 +351,7 @@ export default function AnalysisPage() {
                   <img
                     src={preview}
                     alt="Preview of selected image"
-                    className="w-full max-h-[360px] object-cover border border-white/10 shadow-2xl"
-                    style={{ borderRadius: 'calc(var(--theme-radius, 28px) - 8px)' }}
+                    className="w-full max-h-[360px] object-cover border border-line rounded"
                   />
 
                   <button
@@ -429,7 +360,7 @@ export default function AnalysisPage() {
                       e.stopPropagation()
                       clearSelectedFile()
                     }}
-                    className="absolute -top-3 -right-3 w-9 h-9 rounded-full bg-rose-500 text-white flex items-center justify-center shadow-lg hover:bg-rose-600"
+                    className="absolute -top-3 -right-3 w-9 h-9 rounded-full bg-ink text-paper flex items-center justify-center hover:bg-accent-hover"
                     aria-label="Remove selected image"
                   >
                     <X className="w-4 h-4" />
@@ -437,51 +368,51 @@ export default function AnalysisPage() {
                 </div>
 
                 <div>
-                  <p className="text-xs uppercase tracking-[0.18em] text-emerald-300 mb-3">
+                  <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-ink-faint mb-3">
                     Image selected
                   </p>
 
-                  <h2 className="text-2xl md:text-3xl font-bold text-white break-words">
+                  <h2 className="font-display text-2xl md:text-3xl font-medium text-ink break-words">
                     {file?.name}
                   </h2>
 
-                  <p className="mt-3 text-slate-400 leading-7">
+                  <p className="mt-3 text-ink-muted leading-7">
                     Your image is ready. Adjust the configuration only if needed, then start the
                     analysis when you’re happy with the setup.
                   </p>
 
                   <div className="mt-5 flex flex-wrap gap-2">
-                    <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border border-white/10 bg-white/[0.04] text-slate-200">
+                    <span className="inline-flex items-center rounded px-2.5 py-1 text-xs font-mono border border-line-strong bg-paper-raised text-ink">
                       {selectedSummary.detector}
                     </span>
-                    <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border border-white/10 bg-white/[0.04] text-slate-200">
+                    <span className="inline-flex items-center rounded px-2.5 py-1 text-xs font-mono border border-line-strong bg-paper-raised text-ink">
                       {selectedSummary.scene}
                     </span>
-                    <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium border border-white/10 bg-white/[0.04] text-slate-200">
+                    <span className="inline-flex items-center rounded px-2.5 py-1 text-xs font-mono border border-line-strong bg-paper-raised text-ink">
                       {selectedSummary.story}
                     </span>
                   </div>
 
-                  <div className="mt-5 text-sm text-slate-500">
+                  <div className="mt-5 text-sm font-mono text-ink-faint">
                     {formatFileSize(file?.size)}
                   </div>
                 </div>
               </div>
             ) : (
               <div className="py-10 md:py-14 text-center">
-                <div className="w-16 h-16 rounded-3xl border border-white/10 bg-white/[0.05] flex items-center justify-center mx-auto mb-5">
+                <div className="w-14 h-14 rounded-full border border-line flex items-center justify-center mx-auto mb-5">
                   {isDragActive ? (
-                    <Upload className="w-8 h-8 text-cyan-300" />
+                    <Upload className="w-6 h-6 text-ink" />
                   ) : (
-                    <ImageIcon className="w-8 h-8 text-slate-400" />
+                    <ImageIcon className="w-6 h-6 text-ink-muted" />
                   )}
                 </div>
 
-                <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-white">
+                <h2 className="font-display text-2xl md:text-3xl font-medium text-ink">
                   {isDragActive ? 'Drop your image here' : 'Drag & drop or click to upload'}
                 </h2>
 
-                <p className="mt-3 text-slate-400 text-sm md:text-base">
+                <p className="mt-3 text-ink-muted text-sm md:text-base">
                   JPEG, PNG, WEBP, BMP — up to 10 MB
                 </p>
               </div>
@@ -490,15 +421,12 @@ export default function AnalysisPage() {
         </SurfaceCard>
 
         {isHeavyCombo && (
-          <div
-            className="border border-amber-400/20 bg-amber-500/10"
-            style={{ borderRadius: 'calc(var(--theme-radius, 28px) - 6px)' }}
-          >
+          <div className="border border-line-strong rounded bg-caution-subtle">
             <div className="px-4 py-4 flex items-start gap-3">
-              <AlertTriangle className="w-4 h-4 text-amber-300 mt-0.5 flex-shrink-0" />
+              <AlertTriangle className="w-4 h-4 text-caution mt-0.5 flex-shrink-0" />
               <div>
-                <p className="text-sm font-semibold text-amber-200">Slower configuration selected</p>
-                <p className="text-xs text-amber-100/80 mt-1 leading-5">
+                <p className="text-sm font-semibold text-caution">Slower configuration selected</p>
+                <p className="text-xs text-ink-muted mt-1 leading-5">
                   Advanced detection or advanced scene description may take longer. Balanced is
                   usually the best default.
                 </p>
@@ -511,8 +439,8 @@ export default function AnalysisPage() {
           <div className="p-5 md:p-6">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
               <div>
-                <p className="text-sm font-semibold text-white">Workflow configuration</p>
-                <p className="text-sm text-slate-400 mt-1">
+                <p className="text-sm font-semibold text-ink">Workflow configuration</p>
+                <p className="text-sm text-ink-muted mt-1">
                   Use a preset for speed, or open advanced settings for fine control.
                 </p>
               </div>
@@ -520,7 +448,7 @@ export default function AnalysisPage() {
               <button
                 type="button"
                 onClick={() => setShowSettings((prev) => !prev)}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl border border-white/10 bg-white/[0.03] text-slate-200 hover:bg-white/[0.06] transition-colors self-start lg:self-auto"
+                className="btn-secondary self-start lg:self-auto"
               >
                 <SlidersHorizontal className="w-4 h-4" />
                 {showSettings ? 'Hide Advanced Settings' : 'Advanced Settings'}
@@ -599,8 +527,8 @@ export default function AnalysisPage() {
         <SurfaceCard padded={false}>
           <div className="p-5 md:p-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
             <div>
-              <p className="text-sm font-semibold text-white">Ready to analyse</p>
-              <p className="text-sm text-slate-400 mt-1">
+              <p className="text-sm font-semibold text-ink">Ready to analyse</p>
+              <p className="text-sm text-ink-muted mt-1">
                 Upload your image, confirm the setup, and start the pipeline.
               </p>
             </div>
@@ -609,9 +537,8 @@ export default function AnalysisPage() {
               <button
                 type="submit"
                 disabled={!file || loading}
-                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-cyan-400 text-slate-950 font-semibold hover:bg-cyan-300 transition-colors disabled:opacity-60 disabled:cursor-not-allowed min-w-[190px]"
+                className="btn-primary min-w-[190px] disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <Sparkles className="w-4 h-4" />
                 {loading ? 'Uploading…' : 'Analyse Image'}
               </button>
 
@@ -619,7 +546,7 @@ export default function AnalysisPage() {
                 type="button"
                 onClick={clearSelectedFile}
                 disabled={!file || loading}
-                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl border border-white/10 bg-white/[0.03] text-slate-200 hover:bg-white/[0.06] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Clear
               </button>

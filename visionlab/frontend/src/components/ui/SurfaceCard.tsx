@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import clsx from 'clsx'
+import { useSettings } from '../../hooks/useSettings'
 
 interface SurfaceCardProps {
   children: ReactNode
@@ -14,15 +15,20 @@ export function SurfaceCard({
   padded = true,
   as: Tag = 'section',
 }: SurfaceCardProps) {
+  const { committed } = useSettings()
+  const isCompact = committed.density === 'compact'
+  const isShadowSeparation = committed.separation === 'shadow'
+
   return (
     <Tag
       className={clsx(
-        'border border-white/10 bg-white/[0.04] backdrop-blur-xl shadow-2xl',
+        'rounded-lg border shadow-card',
+        isShadowSeparation ? 'border-transparent shadow-raised' : 'border-line',
+        'bg-paper-raised',
         className,
       )}
-      style={{ borderRadius: 'var(--theme-radius, 28px)' }}
     >
-      {padded ? <div className="p-5 md:p-6">{children}</div> : children}
+      {padded ? <div className={isCompact ? 'p-4' : 'p-5 md:p-6'}>{children}</div> : children}
     </Tag>
   )
 }

@@ -1,30 +1,20 @@
 import { twMerge } from 'tailwind-merge'
 
-const glowMap = {
-  none:    '',
-  cyan:    'drop-shadow-[0_0_8px_rgba(6,182,212,0.7)]',
-  indigo:  'drop-shadow-[0_0_8px_rgba(99,102,241,0.7)]',
-  violet:  'drop-shadow-[0_0_8px_rgba(168,85,247,0.7)]',
-  emerald: 'drop-shadow-[0_0_8px_rgba(16,185,129,0.7)]',
-  amber:   'drop-shadow-[0_0_8px_rgba(245,158,11,0.7)]',
-} as const
-
 const colorMap = {
-  none:    'text-slate-100',
-  cyan:    'text-cyan-300',
-  indigo:  'text-indigo-300',
-  violet:  'text-violet-300',
-  emerald: 'text-emerald-300',
-  amber:   'text-amber-300',
+  none:     'text-ink',
+  accent:   'text-accent',
+  positive: 'text-positive',
+  caution:  'text-caution',
+  negative: 'text-negative',
 } as const
 
-type GlowColor = keyof typeof glowMap
+type ReadoutColor = keyof typeof colorMap
 
 interface DataReadoutProps {
   value:      string | number
   label?:     string
   unit?:      string
-  glow?:      GlowColor
+  color?:     ReadoutColor
   size?:      'sm' | 'md' | 'lg' | 'xl'
   className?: string
   mono?:      boolean
@@ -37,11 +27,14 @@ const sizeMap = {
   xl: { value: 'text-6xl', label: 'text-base',   unit: 'text-lg'  },
 }
 
+// Every confidence %, timing, model name, and ID in the product renders
+// through this component (or matches its mono treatment) — a deliberate
+// technical signature, not decoration.
 export function DataReadout({
   value,
   label,
   unit,
-  glow = 'none',
+  color = 'none',
   size = 'md',
   className,
   mono = true,
@@ -51,7 +44,7 @@ export function DataReadout({
   return (
     <div className={twMerge('flex flex-col gap-0.5', className)}>
       {label && (
-        <span className={`${sz.label} text-slate-500 uppercase tracking-widest font-medium`}>
+        <span className={`${sz.label} text-ink-faint uppercase tracking-wide font-medium`}>
           {label}
         </span>
       )}
@@ -59,16 +52,15 @@ export function DataReadout({
         <span
           className={twMerge(
             sz.value,
-            'font-bold tabular-nums leading-none',
+            'font-semibold tabular-nums leading-none',
             mono && 'font-mono',
-            colorMap[glow],
-            glowMap[glow],
+            colorMap[color],
           )}
         >
           {value}
         </span>
         {unit && (
-          <span className={`${sz.unit} text-slate-500 font-medium`}>{unit}</span>
+          <span className={`${sz.unit} text-ink-muted font-medium`}>{unit}</span>
         )}
       </div>
     </div>

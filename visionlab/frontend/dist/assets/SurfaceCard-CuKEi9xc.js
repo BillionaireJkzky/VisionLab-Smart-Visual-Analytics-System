@@ -1,1 +1,0 @@
-import{j as s,b as o}from"./index-D64C9v_8.js";function i({children:r,className:e="",padded:a=!0,as:t="section"}){return s.jsx(t,{className:o("border border-white/10 bg-white/[0.04] backdrop-blur-xl shadow-2xl",e),style:{borderRadius:"var(--theme-radius, 28px)"},children:a?s.jsx("div",{className:"p-5 md:p-6",children:r}):r})}export{i as S};

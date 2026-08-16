@@ -15,16 +15,17 @@ const ResultPage    = lazy(() => import('./pages/ResultPage'))
 const HistoryPage   = lazy(() => import('./pages/HistoryPage'))
 const ProgressPage  = lazy(() => import('./pages/ProgressPage'))
 const AdminPage     = lazy(() => import('./pages/AdminPage'))
+const UiSettingsPage = lazy(() => import('./pages/UiSettingsPage'))
 
 function PageLoader() {
   return (
     <div
-      className="flex flex-col items-center justify-center h-full min-h-[400px] gap-3 text-slate-400"
+      className="flex flex-col items-center justify-center h-full min-h-[400px] gap-3 text-ink-muted"
       role="status"
       aria-live="polite"
       aria-busy="true"
     >
-      <Loader2 className="w-7 h-7 text-cyan-400 animate-spin" />
+      <Loader2 className="w-6 h-6 text-ink-muted animate-spin" />
       <span className="text-sm">Loading...</span>
     </div>
   )
@@ -33,7 +34,7 @@ function PageLoader() {
 function RouteLoadingState() {
   return (
     <div
-      className="flex items-center justify-center h-screen text-slate-300"
+      className="flex items-center justify-center h-screen bg-paper text-ink-muted"
       role="status"
       aria-live="polite"
       aria-busy="true"
@@ -101,6 +102,10 @@ export default function App() {
               <Suspense fallback={<PageLoader />}><AdminPage /></Suspense>
             </AdminRoute>
           }
+        />
+        <Route
+          path="settings"
+          element={<Suspense fallback={<PageLoader />}><UiSettingsPage /></Suspense>}
         />
       </Route>
 

@@ -5,55 +5,242 @@
 /* ── Design tokens ───────────────────────────────────────────────────────── */
 @layer base {
   :root {
-    --color-bg:             #020a14;
-    --color-bg-secondary:   #060f1d;
-    --color-surface:        rgba(255, 255, 255, 0.04);
-    --color-surface-strong: rgba(255, 255, 255, 0.08);
-    --color-surface-hover:  rgba(255, 255, 255, 0.06);
+    /* Warm paper background. NOT pure white, NOT dark. */
+    --color-bg:             #F7F4EE;
+    --color-bg-secondary:   #F1EDE3;
+    --color-surface:        #FFFFFF;
+    --color-surface-strong: #FFFFFF;
+    --color-surface-hover:  #FBFAF6;
 
-    --color-text:       #dde8f5;
-    --color-text-muted: #7a95b5;
-    --color-text-faint: #4a6480;
+    /* Warm ink text — hierarchy from size/weight, not colour. */
+    --color-text:       #1C1917;
+    --color-text-muted: #6E6659;
+    --color-text-faint: #8C8272; /* large text/icons only — not AA at small sizes */
 
-    --color-border:        rgba(255, 255, 255, 0.07);
-    --color-border-strong: rgba(255, 255, 255, 0.14);
+    /* Hairline borders, not glow. */
+    --color-border:        #E6E1D6;
+    --color-border-strong: #C7BEAC;
 
-    --color-primary:       #22d3ee;
-    --color-primary-glow:  rgba(34, 211, 238, 0.25);
-    --color-primary-hover: #67e8f9;
-    --color-secondary:     #8b5cf6;
-    --color-tertiary:      #d946ef;
+    /* Monochrome — the default "accent" is a weight (near-black), not a hue. */
+    --color-primary:         #1C1917;
+    --color-primary-hover:   #332E29;
+    --color-primary-active:  #000000;
+    --color-primary-subtle:  #EFEBE2;
+    --color-text-onaccent:   #F7F4EE;
+    --color-secondary:      #6E6659;
+    --color-tertiary:       #8C8272;
 
-    --color-success:      #22c55e;
-    --color-success-glow: rgba(34, 197, 94, 0.2);
-    --color-warning:      #f59e0b;
-    --color-error:        #f43f5e;
-    --color-error-glow:   rgba(244, 63, 94, 0.2);
+    /* Status conveyed by darkness + the mono text label, never by hue. */
+    --color-success: #57534E;
+    --color-success-subtle: #F0EDE6;
+    --color-warning: #44403C;
+    --color-warning-subtle: #ECE7DC;
+    --color-error:   #1C1917;
+    --color-error-subtle:   #E6E1D6;
 
-    --glow-cyan:    0 0 30px rgba(34, 211, 238, 0.26), 0 0 8px rgba(34, 211, 238, 0.16);
-    --glow-blue:    0 0 30px rgba(59, 130, 246, 0.24), 0 0 8px rgba(59, 130, 246, 0.14);
-    --glow-fuchsia: 0 0 30px rgba(217, 70, 239, 0.22), 0 0 8px rgba(217, 70, 239, 0.12);
-    --glow-plasma:  0 0 30px rgba(139, 92, 246, 0.24), 0 0 8px rgba(139, 92, 246, 0.14);
-    --inner-top:    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    /* One subtle lift only. No glow, ever. */
+    --shadow-card:   0 1px 2px rgba(28, 25, 23, 0.05);
+    --shadow-raised: 0 2px 6px rgba(28, 25, 23, 0.08);
+    --inner-top:     none;
+
+    /* Corner radius — Surface & Shape setting flattens these (.radius-sharp). */
+    --radius-sm:      4px;
+    --radius-default: 6px;
+    --radius-lg:      8px;
+
+    /* Typography — Typography setting swaps this for the sans font (.font-clean). */
+    --font-display: 'Fraunces', Georgia, serif;
+
+    /* Legacy aliases some not-yet-migrated pages/components still read. */
+    --color-primary-glow: transparent;
+    --color-success-glow: transparent;
+    --color-error-glow:   transparent;
+    --glow-cyan: none; --glow-blue: none; --glow-fuchsia: none; --glow-plasma: none;
   }
 
+  /* ── Appearance: Dark (warm near-black, NOT navy) ──────────────────────────
+     Toggled on <html> by useSettings (directly for "dark", or resolved from
+     prefers-color-scheme when the user picked "system"). Every value here is
+     WCAG AA-checked against its paired text/background — see the UI
+     customisation plan for the contrast math. ── */
+  .dark {
+    --color-bg:             #17140F;
+    --color-bg-secondary:   #1D1914;
+    --color-surface:        #211D18;
+    --color-surface-strong: #262119;
+    --color-surface-hover:  #262119;
+
+    --color-text:       #F2EEE6;
+    --color-text-muted: #B8AD9C;
+    --color-text-faint: #8C8272;
+
+    --color-border:        #332D26;
+    --color-border-strong: #474036;
+
+    /* Monochrome default inverts to a near-white solid, mirroring how a
+       printed page's "ink" reads when the page itself goes dark. */
+    --color-primary:        #F2EEE6;
+    --color-primary-hover:  #E4DFD3;
+    --color-primary-active: #FFFFFF;
+    --color-primary-subtle: #2A251E;
+    --color-text-onaccent:  #17140F;
+
+    --color-success: #B8AD9C;
+    --color-success-subtle: #262420;
+    --color-warning: #D6CCB4;
+    --color-warning-subtle: #282420;
+    --color-error:   #F2EEE6;
+    --color-error-subtle:   #2A211E;
+
+    /* Dark elevation reads as a lighter surface, not a stronger shadow —
+       a warm-black shadow is invisible against a near-black page. */
+    --shadow-card:   0 1px 2px rgba(0, 0, 0, 0.35);
+    --shadow-raised: 0 2px 8px rgba(0, 0, 0, 0.45);
+  }
+
+  /* ── Accent — curated, muted, editorial hues. Each has a light-mode value
+     (dark, for use as a solid button on light paper) and a separate
+     dark-mode value (lightened, for legibility against a dark page) — see
+     the ".dark.accent-*" overrides below. Never gradients, never neon. ── */
+  .accent-clay {
+    --color-primary: #8A4A32; --color-primary-hover: #6E3B28;
+    --color-primary-active: #5A301F; --color-primary-subtle: #F3E7DE;
+  }
+  .accent-taupe {
+    --color-primary: #6B5D4F; --color-primary-hover: #564A3F;
+    --color-primary-active: #453B32; --color-primary-subtle: #EFEAE3;
+  }
+  .accent-ochre {
+    --color-primary: #7A5D26; --color-primary-hover: #62491E;
+    --color-primary-active: #4F3B18; --color-primary-subtle: #F1E8D3;
+  }
+  .accent-plum {
+    --color-primary: #6B2C3D; --color-primary-hover: #551F2E;
+    --color-primary-active: #451926; --color-primary-subtle: #F0E1E5;
+  }
+  .accent-charcoal {
+    --color-primary: #3F3A36; --color-primary-hover: #2E2A27;
+    --color-primary-active: #221F1C; --color-primary-subtle: #E8E4DF;
+  }
+
+  /* Dark-mode accent overrides — declared after .dark so they win when both
+     classes are present. Lightened so the accent stays visible (>=3:1)
+     against the dark page background, with dark onaccent text to match. */
+  .dark.accent-clay {
+    --color-primary: #C98A66; --color-primary-hover: #B87850;
+    --color-primary-active: #A66940; --color-primary-subtle: #2A2019;
+    --color-text-onaccent: #17140F;
+  }
+  .dark.accent-taupe {
+    --color-primary: #B5A594; --color-primary-hover: #A3927F;
+    --color-primary-active: #91806D; --color-primary-subtle: #26221D;
+    --color-text-onaccent: #17140F;
+  }
+  .dark.accent-ochre {
+    --color-primary: #C9A662; --color-primary-hover: #B8934C;
+    --color-primary-active: #A68139; --color-primary-subtle: #2A2419;
+    --color-text-onaccent: #17140F;
+  }
+  .dark.accent-plum {
+    --color-primary: #B37690; --color-primary-hover: #A0637D;
+    --color-primary-active: #8D5169; --color-primary-subtle: #2A2024;
+    --color-text-onaccent: #17140F;
+  }
+  .dark.accent-charcoal {
+    --color-primary: #C9C2B8; --color-primary-hover: #B7AFA3;
+    --color-primary-active: #A59C8F; --color-primary-subtle: #26241F;
+    --color-text-onaccent: #17140F;
+  }
+
+  /* ── Typography — "Clean" swaps the display serif for the same grotesk
+     used for body copy. No new fonts loaded; Inter is already in index.html. ── */
+  .font-clean {
+    --font-display: 'Inter', system-ui, sans-serif;
+  }
+
+  /* ── Density, sidebar, content width ─────────────────────────────────────
+     These are NOT implemented as CSS class overrides here: Tailwind's
+     spacing utilities (p-6, gap-3, ...) hardcode pixel values directly and
+     sit in a later cascade layer than @layer components, so a class-based
+     override would silently lose to them. Instead Layout.tsx, Card.tsx and
+     SurfaceCard.tsx read the committed density/sidebar/content-width setting
+     directly (via useSettings()) and switch which Tailwind classes they
+     render — reliable, and the default (comfortable/expanded/wide) renders
+     the exact same classes as before this feature existed. ── */
+
+  /* ── Surface & Shape: corner radius. This one IS a pure CSS-var override
+     (no cascade-layer conflict) since borderRadius in tailwind.config.js
+     already resolves through --radius-*, not a hardcoded pixel value. ── */
+  .radius-sharp {
+    --radius-sm: 0px;
+    --radius-default: 2px;
+    --radius-lg: 2px;
+  }
+
+  /* Separation (hairline border vs subtle shadow) is likewise applied by
+     Card.tsx/SurfaceCard.tsx directly, for the same cascade-layer reason. */
+
+  /* ── Accessibility: underline links ──────────────────────────────────── */
+  .underline-links a {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  /* ── Typography: reading comfort — a touch more breathing room in body
+     copy only, not headings/buttons/labels. ── */
+  [data-reading-comfort='relaxed'] p,
+  [data-reading-comfort='relaxed'] li {
+    line-height: 1.85;
+    letter-spacing: 0.01em;
+  }
+
+  /* ── High-contrast — a distinct ACCESSIBILITY mode (max-contrast + colour-
+     coded status for low-vision users), independent of the main aesthetic.
+     Deliberately keeps colour-coded success/warning/error rather than going
+     monochrome — WCAG/colourblind-safe convention takes priority over the
+     "no green" brand rule here; nowhere else in the app uses colour this way.
+     Declared last so it overrides Dark/Accent when combined with them —
+     High Contrast always wins and forces pure black-on-white. ── */
   .high-contrast {
-    --color-bg:             #000000;
-    --color-bg-secondary:   #0a0a0a;
-    --color-surface:        #111111;
-    --color-surface-strong: #1a1a1a;
-    --color-text:           #ffffff;
-    --color-text-muted:     #d1d5db;
-    --color-border:         #ffffff;
-    --color-primary:        #ffff00;
-    --color-primary-hover:  #fff176;
-    --color-success:        #00ff66;
-    --color-warning:        #ffb300;
-    --color-error:          #ff4d4f;
-    --glow-cyan:    none;
-    --glow-blue:    none;
-    --glow-fuchsia: none;
-    --glow-plasma:  none;
+    --color-bg:             #ffffff;
+    --color-bg-secondary:   #f5f5f5;
+    --color-surface:        #ffffff;
+    --color-surface-strong: #f0f0f0;
+    --color-surface-hover:  #f0f0f0;
+    --color-text:           #000000;
+    --color-text-muted:     #1a1a1a;
+    --color-text-faint:     #1a1a1a;
+    --color-border:         #000000;
+    --color-border-strong:  #000000;
+    --color-primary:        #000000;
+    --color-primary-hover:  #1a1a1a;
+    --color-primary-active: #000000;
+    --color-primary-subtle: #e5e5e5;
+    --color-text-onaccent:  #ffffff;
+    --color-success:        #006600;
+    --color-success-subtle: #e5f5e5;
+    --color-warning:        #995c00;
+    --color-warning-subtle: #fbeedd;
+    --color-error:          #cc0000;
+    --color-error-subtle:   #fbe2e2;
+    --shadow-card: none;
+    --shadow-raised: none;
+  }
+
+  /* ── Reduce motion (migrated from theme.css — the old --bg-base var it
+     referenced was never overridden by any mode, which would have pinned
+     every user's background to light paper the moment Dark mode shipped). ── */
+  .calm-mode *,
+  .calm-mode *::before,
+  .calm-mode *::after {
+    animation-duration:        0.01ms !important;
+    animation-iteration-count: 1      !important;
+    transition-duration:       0.15ms !important;
+    animation-delay:           0.01ms !important;
+  }
+
+  .calm-mode body {
+    background: var(--color-bg) !important;
   }
 
   html {
@@ -62,16 +249,19 @@
 
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration:        0.01ms !important;
+      animation-iteration-count: 1      !important;
+      transition-duration:       0.15ms !important;
+    }
   }
 
   body {
     @apply font-sans antialiased;
-    background:
-      radial-gradient(ellipse 80% 55% at 10% -8%,  rgba(34, 211, 238, 0.09) 0%, transparent 58%),
-      radial-gradient(ellipse 60% 50% at 90%  4%,  rgba(139, 92, 246, 0.1)  0%, transparent 55%),
-      radial-gradient(ellipse 70% 55% at 50% 105%, rgba(59, 130, 246, 0.08) 0%, transparent 55%),
-      radial-gradient(ellipse 40% 40% at  4%  65%, rgba(217, 70, 239, 0.06) 0%, transparent 50%),
-      var(--color-bg);
+    background: var(--color-bg);
     color: var(--color-text);
   }
 
@@ -80,176 +270,86 @@
   }
 
   *:focus-visible {
-    @apply outline-none ring-2 ring-cyan-400 ring-offset-2;
+    @apply outline-none ring-2 ring-offset-2;
+    ring-color: var(--color-primary);
     ring-offset-color: var(--color-bg);
   }
 
   ::selection {
-    background: rgba(34, 211, 238, 0.2);
-    color: #ffffff;
+    background: var(--color-primary-subtle);
+    color: var(--color-text);
   }
 
   .skip-link {
     @apply sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100]
-           focus:px-4 focus:py-2 focus:rounded-xl focus:font-medium;
-    background: linear-gradient(135deg, #22d3ee, #8b5cf6);
-    color: white;
-    box-shadow: var(--glow-cyan);
+           focus:px-4 focus:py-2 focus:rounded-md focus:font-medium;
+    background: var(--color-primary);
+    color: var(--color-text-onaccent);
   }
 }
 
 /* ── Component library ───────────────────────────────────────────────────── */
 @layer components {
 
-  /* ── Cards ── */
+  /* ── Cards — flat surface, hairline border, one subtle lift ── */
   .card {
-    @apply rounded-3xl border p-6;
+    @apply rounded-lg border p-6;
     background: var(--color-surface);
-    backdrop-filter: blur(28px) saturate(180%);
-    -webkit-backdrop-filter: blur(28px) saturate(180%);
     border-color: var(--color-border);
-    box-shadow:
-      0 20px 50px rgba(0, 0, 0, 0.4),
-      var(--inner-top);
+    box-shadow: var(--shadow-card);
   }
 
-  .glass-panel {
-    @apply rounded-3xl border;
-    background: rgba(255, 255, 255, 0.04);
-    backdrop-filter: blur(28px) saturate(180%);
-    -webkit-backdrop-filter: blur(28px) saturate(180%);
-    border-color: rgba(255, 255, 255, 0.08);
-  }
-
-  .glass-premium {
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(36px) saturate(200%);
-    -webkit-backdrop-filter: blur(36px) saturate(200%);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    box-shadow:
-      0 24px 60px rgba(0, 0, 0, 0.45),
-      inset 0 1px 0 rgba(255, 255, 255, 0.06),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.2);
-  }
-
-  /* ── Buttons ── */
+  /* ── Buttons — primary is solid near-black, never a colour (unless a
+     curated accent is active) ── */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl
-           font-semibold text-sm transition-all duration-200 active:scale-[0.97];
-    background: linear-gradient(135deg, #22d3ee 0%, #3b82f6 48%, #8b5cf6 100%);
-    color: white;
-    position: relative;
-    overflow: hidden;
-    box-shadow:
-      0 8px 26px rgba(34, 211, 238, 0.24),
-      0 2px 8px rgba(59, 130, 246, 0.18),
-      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded
+           font-medium text-sm transition-colors duration-150;
+    background: var(--color-primary);
+    color: var(--color-text-onaccent);
   }
-
-  .btn-primary::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      105deg,
-      transparent 20%,
-      rgba(255, 255, 255, 0.22) 50%,
-      transparent 80%
-    );
-    background-size: 400px 100%;
-    opacity: 0;
-    transition: opacity 0.25s;
-  }
-
-  .btn-primary:hover::before {
-    opacity: 1;
-    animation: shimmer 0.75s ease-out forwards;
-  }
-
-  .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow:
-      0 14px 34px rgba(34, 211, 238, 0.32),
-      0 4px 14px rgba(139, 92, 246, 0.24),
-      inset 0 1px 0 rgba(255, 255, 255, 0.24);
-  }
+  .btn-primary:hover { background: var(--color-primary-hover); }
+  .btn-primary:active { transform: translateY(0.5px); }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl
-           font-semibold text-sm transition-all duration-200 active:scale-[0.97];
-    background: rgba(255, 255, 255, 0.05);
-    color: #c4d8f0;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded
+           font-medium text-sm transition-colors duration-150;
+    background: var(--color-surface);
+    color: var(--color-text);
+    border: 1px solid var(--color-border-strong);
   }
-
   .btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.09);
-    border-color: rgba(255, 255, 255, 0.18);
-    color: white;
-    transform: translateY(-1px);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    background: var(--color-surface-hover);
+    border-color: var(--color-text-faint);
   }
 
-  /* ── Badges ── */
+  /* ── Badges — differentiated by weight, not hue ── */
   .badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border font-mono;
   }
 
-  .badge-green  { @apply badge; background: rgba(34,197,94,0.1);   color: #86efac; border-color: rgba(34,197,94,0.2); }
-  .badge-blue   { @apply badge; background: rgba(59,130,246,0.12); color: #93c5fd; border-color: rgba(59,130,246,0.2); }
-  .badge-yellow { @apply badge; background: rgba(245,158,11,0.12); color: #fcd34d; border-color: rgba(245,158,11,0.22); }
-  .badge-red    { @apply badge; background: rgba(244,63,94,0.12);  color: #fda4af; border-color: rgba(244,63,94,0.22); }
-  .badge-gray   { @apply badge; background: rgba(148,163,184,0.1); color: #cbd5e1; border-color: rgba(148,163,184,0.18); }
+  .badge-green  { @apply badge; background: var(--color-success-subtle); color: var(--color-success); border-color: var(--color-success); }
+  .badge-blue   { @apply badge; background: var(--color-primary-subtle); color: var(--color-primary); border-color: var(--color-primary); }
+  .badge-yellow { @apply badge; background: var(--color-warning-subtle); color: var(--color-warning); border-color: var(--color-warning); }
+  .badge-red    { @apply badge; background: var(--color-error-subtle);   color: var(--color-error);   border-color: var(--color-error); font-weight: 600; }
+  .badge-gray   { @apply badge; background: var(--color-bg-secondary);   color: var(--color-text-muted); border-color: var(--color-border); }
 
-  /* ── Emotion states ── */
-  .emotion-happy    { @apply border; background: rgba(250,204,21,0.1);  color: #fde68a; border-color: rgba(250,204,21,0.2); }
-  .emotion-sad      { @apply border; background: rgba(59,130,246,0.1);  color: #bfdbfe; border-color: rgba(59,130,246,0.2); }
-  .emotion-angry    { @apply border; background: rgba(239,68,68,0.1);   color: #fecaca; border-color: rgba(239,68,68,0.2); }
-  .emotion-surprise { @apply border; background: rgba(168,85,247,0.1);  color: #ddd6fe; border-color: rgba(168,85,247,0.2); }
-  .emotion-fear     { @apply border; background: rgba(249,115,22,0.1);  color: #fdba74; border-color: rgba(249,115,22,0.2); }
-  .emotion-disgust  { @apply border; background: rgba(34,197,94,0.1);   color: #bbf7d0; border-color: rgba(34,197,94,0.2); }
-  .emotion-neutral  { @apply border; background: rgba(148,163,184,0.1); color: #e2e8f0; border-color: rgba(148,163,184,0.18); }
-
-  /* ── Neon & effects ── */
-  .neon-border {
-    box-shadow:
-      inset 0 0 0 1px rgba(34, 211, 238, 0.16),
-      0 0 20px rgba(34, 211, 238, 0.08);
-  }
-
-  .neon-text {
-    color: #cffafe;
-    text-shadow: 0 0 20px rgba(34, 211, 238, 0.22);
-  }
-
-  .holographic-text {
-    background: linear-gradient(
-      135deg,
-      #67e8f9 0%,
-      #a78bfa 35%,
-      #f0abfc 65%,
-      #67e8f9 100%
-    );
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    animation: shimmer 3s linear infinite;
-  }
+  /* ── Emotion states — monochrome, weight-differentiated, no hue ── */
+  .emotion-happy    { @apply border rounded font-mono text-xs px-2 py-0.5; background: var(--color-bg-secondary);   color: var(--color-text);       border-color: var(--color-border-strong); }
+  .emotion-sad      { @apply border rounded font-mono text-xs px-2 py-0.5; background: var(--color-success-subtle); color: var(--color-success);    border-color: var(--color-border-strong); }
+  .emotion-angry    { @apply border rounded font-mono text-xs px-2 py-0.5; background: var(--color-error-subtle);   color: var(--color-error);      border-color: var(--color-text); font-weight: 600; }
+  .emotion-surprise { @apply border rounded font-mono text-xs px-2 py-0.5; background: var(--color-warning-subtle); color: var(--color-warning);    border-color: var(--color-border-strong); }
+  .emotion-fear     { @apply border rounded font-mono text-xs px-2 py-0.5; background: var(--color-bg-secondary);   color: var(--color-text-muted); border-color: var(--color-border-strong); }
+  .emotion-disgust  { @apply border rounded font-mono text-xs px-2 py-0.5; background: var(--color-success-subtle); color: var(--color-success);    border-color: var(--color-border-strong); }
+  .emotion-neutral  { @apply border rounded font-mono text-xs px-2 py-0.5; background: var(--color-bg-secondary);   color: var(--color-text-muted); border-color: var(--color-border-strong); }
 }
 
-/* ── Scrollbar ───────────────────────────────────────────────────────────── */
-::-webkit-scrollbar       { width: 4px; height: 4px; }
+/* ── Scrollbar — plain, neutral ─────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, rgba(34,211,238,0.55), rgba(139,92,246,0.55));
-  border-radius: 999px;
+  background: var(--color-border-strong);
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, rgba(34,211,238,0.9), rgba(139,92,246,0.9));
+  background: var(--color-text-faint);
 }

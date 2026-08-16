@@ -64,12 +64,11 @@ def _warmup_all_models(sender=None, **kwargs):  # noqa: ANN001
     """Pre-load every heavy model so the first user request is fast."""
     logger.info("Celery worker ready — starting model warm-up.")
 
-    try:
-        from app.services.detection import warmup_models
-        warmup_models(["fast", "balanced"])  # advanced loads on demand only
-    except Exception as exc:  # noqa: BLE001
-        logger.warning("Detection warm-up skipped: %s", exc)
-
+    # OCR warms up first and alone: EasyOCR's first-ever download writes a
+    # fixed-name temp zip into its cache dir, so a fresh (or newly-persisted
+    # but empty) volume must be populated by exactly one caller before any
+    # other warm-up or request-time step can race a concurrent download into
+    # the same path.
     try:
         from app.services.ocr import warmup_ocr
         warmup_ocr()
@@ -77,9 +76,21 @@ def _warmup_all_models(sender=None, **kwargs):  # noqa: ANN001
         logger.warning("OCR warm-up skipped: %s", exc)
 
     try:
+        from app.services.detection import warmup_models
+        warmup_models(["fast", "balanced"])  # advanced loads on demand only
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("Detection warm-up skipped: %s", exc)
+
+    try:
         from app.services.emotion import warmup_emotion
         warmup_emotion()
     except Exception as exc:  # noqa: BLE001
         logger.warning("Emotion warm-up skipped: %s", exc)
+
+    try:
+        from app.services.scene import warmup_scene
+        warmup_scene(["git"])  # only the default scene model; others load lazily on demand
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("Scene warm-up skipped: %s", exc)
 
     logger.info("Model warm-up complete. Worker is ready to serve fast requests.")

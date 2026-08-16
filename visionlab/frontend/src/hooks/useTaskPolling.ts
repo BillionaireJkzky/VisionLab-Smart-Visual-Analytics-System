@@ -68,11 +68,17 @@ export function useTaskPolling(taskId: string | undefined): UseTaskPollingResult
 
   const pollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const isMountedRef = useRef(true)
+  // Audio narration finishes as a background task after the rest of the
+  // pipeline reports "completed" (see backend: synthesise_audio_task). This
+  // tracks whether we've already fetched the full result at least once, so
+  // we don't re-fetch on every poll while only waiting on audio_url.
+  const hasFetchedResultRef = useRef(false)
 
   useEffect(() => {
     if (!taskId) return
 
     isMountedRef.current = true
+    hasFetchedResultRef.current = false
     setResult(null)
     setStatus('pending')
     setCurrentStep('queued')
@@ -121,8 +127,26 @@ export function useTaskPolling(taskId: string | undefined): UseTaskPollingResult
           setProgressMessage(task.progress_message ?? null)
         }
 
-        if (task.status === 'completed') { await fetchResult(); return }
         if (task.status === 'failed') { setError(task.error_message ?? 'Analysis failed.'); return }
+
+        if (task.status === 'completed') {
+          const ttsStatus = task.step_details?.tts?.status
+          const ttsStillPending = ttsStatus === 'running' || ttsStatus === 'waiting'
+
+          // Fetch once immediately on first completion (shows detections/story/
+          // quiz/etc. right away), and once more when audio finishes resolving
+          // (done or failed) to pick up the final audio_url. Skip re-fetching on
+          // every poll in between while only audio is still pending.
+          if (!hasFetchedResultRef.current || !ttsStillPending) {
+            await fetchResult()
+            hasFetchedResultRef.current = true
+          }
+
+          if (ttsStillPending) {
+            schedulePoll(1500)
+          }
+          return
+        }
 
         schedulePoll(task.status === 'pending' ? 1200 : 700)
       } catch (err: unknown) {

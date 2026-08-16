@@ -55,6 +55,19 @@ def _pretty_label(label: str) -> str:
     return label.title()
 
 
+def save_plain_image(image: Image.Image) -> str:
+    """
+    Save the image as-is (no boxes/labels), for when there's nothing to draw
+    on it — the caller couldn't draw detections (e.g. an unexpected error),
+    but the analysis result should still ALWAYS have a viewable image rather
+    than none at all.
+    """
+    filename = f"{uuid.uuid4().hex}.jpg"
+    output_path = settings.image_dir / filename
+    image.convert("RGB").save(output_path, format="JPEG", quality=92)
+    return f"/images/{filename}"
+
+
 def draw_detections(
     image: Image.Image,
     detections: list[dict],

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Eye, Sparkles } from 'lucide-react'
+import { Eye } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useAuth } from '../hooks/useAuth'
 import { getApiErrorMessage } from '../services/api'
@@ -40,37 +40,24 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden flex items-center justify-center px-4 py-10 bg-[#07111f]">
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -top-20 -left-20 w-72 h-72 rounded-full bg-cyan-500/10 blur-3xl" />
-        <div className="absolute top-1/4 -right-16 w-80 h-80 rounded-full bg-fuchsia-500/10 blur-3xl" />
-        <div className="absolute -bottom-16 left-1/3 w-96 h-96 rounded-full bg-blue-500/10 blur-3xl" />
-      </div>
-
-      <div className="relative z-10 w-full max-w-md animate-fade-in">
+    <div className="min-h-screen flex items-center justify-center px-4 py-10 bg-paper">
+      <div className="w-full max-w-md animate-fade-in">
         <div className="text-center mb-8">
-          <div className="relative inline-flex items-center justify-center mb-5">
-            <div className="absolute inset-0 rounded-3xl bg-cyan-400/25 blur-xl" />
-            <div className="relative inline-flex items-center justify-center w-16 h-16 rounded-3xl bg-gradient-to-br from-cyan-400 via-blue-500 to-fuchsia-500 shadow-2xl">
-              <Eye className="w-8 h-8 text-white" aria-hidden="true" />
-            </div>
-          </div>
-
-          <div className="flex items-center justify-center gap-2">
-            <h1 className="font-display text-3xl font-bold text-white">VisionLab</h1>
-            <Sparkles className="w-4 h-4 text-cyan-300" aria-hidden="true" />
-          </div>
-          <p className="text-slate-400 mt-2">Create your account</p>
+          <Eye className="w-6 h-6 text-ink mx-auto mb-4" aria-hidden="true" />
+          <h1 className="font-display text-3xl font-medium text-ink tracking-tight">VisionLab</h1>
+          <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-ink-faint mt-2">
+            Smart Visual Analytics
+          </p>
         </div>
 
-        <div className="rounded-[28px] border border-white/10 bg-white/[0.05] backdrop-blur-2xl shadow-2xl p-7 md:p-8">
+        <div className="rounded-lg border border-line bg-paper-raised shadow-card p-7 md:p-8">
           <div className="mb-6">
-            <p className="text-xs uppercase tracking-[0.22em] text-cyan-300/80 mb-2">
+            <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-ink-faint mb-2">
               Join VisionLab
             </p>
-            <h2 className="text-2xl font-semibold text-white">Create your account</h2>
-            <p className="text-sm text-slate-400 mt-1">
-              Start your visual AI learning experience in a modern workspace.
+            <h2 className="font-display text-2xl font-medium text-ink tracking-tight">Create your account</h2>
+            <p className="text-sm text-ink-muted mt-1">
+              Start your visual AI learning experience.
             </p>
           </div>
 
@@ -82,7 +69,7 @@ export default function RegisterPage() {
               { name: 'confirm', label: 'Confirm password', type: 'password', placeholder: 'Repeat your password' },
             ].map(({ name, label, type, placeholder }) => (
               <div key={name}>
-                <label htmlFor={name} className="block text-sm font-medium text-slate-200 mb-1.5">
+                <label htmlFor={name} className="block text-[11px] font-mono uppercase tracking-[0.14em] text-ink-faint mb-2">
                   {label}
                 </label>
                 <input
@@ -93,7 +80,7 @@ export default function RegisterPage() {
                   value={form[name as keyof typeof form]}
                   onChange={handleChange}
                   placeholder={placeholder}
-                  className="w-full px-4 py-3 rounded-2xl border border-white/10 bg-white/5 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                  className="w-full rounded border border-line-strong bg-paper-raised px-4 py-3 text-sm text-ink placeholder:text-ink-faint outline-none transition-colors focus:border-ink"
                 />
               </div>
             ))}
@@ -101,16 +88,16 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading}
-              className="btn-primary w-full justify-center py-3 disabled:opacity-60 disabled:cursor-not-allowed mt-2"
+              className="btn-primary w-full justify-center py-3 disabled:opacity-50 disabled:cursor-not-allowed mt-2"
             >
               {loading ? 'Creating account…' : 'Create Account'}
             </button>
           </form>
 
-          <div className="mt-6 pt-5 border-t border-white/10 text-center">
-            <p className="text-sm text-slate-400">
+          <div className="mt-6 pt-5 border-t border-line text-center">
+            <p className="text-sm text-ink-muted">
               Already have an account?{' '}
-              <Link to="/login" className="font-semibold text-cyan-300 hover:text-cyan-200 transition-colors">
+              <Link to="/login" className="font-semibold text-ink underline underline-offset-2">
                 Sign in
               </Link>
             </p>

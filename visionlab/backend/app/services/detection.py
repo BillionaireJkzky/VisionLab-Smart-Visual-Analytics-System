@@ -51,6 +51,10 @@ def _resolve_device() -> str:
     if torch.cuda.is_available():
         _device = "cuda"
         _use_half = True
+        # Images are always resized to a fixed INFERENCE_IMG_SIZE before inference,
+        # so cuDNN's autotuner can safely cache the fastest conv algorithms for that
+        # shape instead of re-searching per call. No effect on output/accuracy.
+        torch.backends.cudnn.benchmark = True
     else:
         _device = "cpu"
         _use_half = False

@@ -1,0 +1,129 @@
+# VisionLab eval — COCO val2017-ONLY dataset config, used by `eval.detection --full`.
+#
+# Ultralytics' bundled coco.yaml downloads train2017 (~19GB) + val2017 (~1GB)
+# + test2017 (~7GB) unconditionally — ~26GB — even though a validation-only
+# run (eval.detection.py always validates, never trains) only ever reads the
+# 'val' split. This file is the same COCO 2017 dataset (same 80 classes,
+# same label format) with the download step trimmed to val2017 only.
+#
+# Note: eval/detection.py does its own pre-flight check before invoking the
+# validator (see `_ensure_coco_val_ready()`) rather than relying solely on
+# Ultralytics' own auto-download trigger here — Ultralytics only checks that
+# the 'val' path (val2017.txt) *exists*, not that the images it lists exist,
+# so a previously-interrupted download can leave that check silently
+# satisfied while images/val2017/ is actually empty. The `download:` script
+# below still makes this yaml correct and self-sufficient if used directly
+# (e.g. `yolo val data=coco_val.yaml`) outside our script.
+
+path: coco  # resolves to <ultralytics datasets_dir>/coco (e.g. /app/datasets/coco)
+
+# 'train:' is required by Ultralytics' dataset schema even though this file
+# is only ever used for validation. It points at the label manifest, not
+# images — no train images are downloaded or read.
+train: train2017.txt
+val: val2017.txt  # val images (relative to 'path') — 5000 images
+
+# Classes — identical to Ultralytics' coco.yaml.
+names:
+  0: person
+  1: bicycle
+  2: car
+  3: motorcycle
+  4: airplane
+  5: bus
+  6: train
+  7: truck
+  8: boat
+  9: traffic light
+  10: fire hydrant
+  11: stop sign
+  12: parking meter
+  13: bench
+  14: bird
+  15: cat
+  16: dog
+  17: horse
+  18: sheep
+  19: cow
+  20: elephant
+  21: bear
+  22: zebra
+  23: giraffe
+  24: backpack
+  25: umbrella
+  26: handbag
+  27: tie
+  28: suitcase
+  29: frisbee
+  30: skis
+  31: snowboard
+  32: sports ball
+  33: kite
+  34: baseball bat
+  35: baseball glove
+  36: skateboard
+  37: surfboard
+  38: tennis racket
+  39: bottle
+  40: wine glass
+  41: cup
+  42: fork
+  43: knife
+  44: spoon
+  45: bowl
+  46: banana
+  47: apple
+  48: sandwich
+  49: orange
+  50: broccoli
+  51: carrot
+  52: hot dog
+  53: pizza
+  54: donut
+  55: cake
+  56: chair
+  57: couch
+  58: potted plant
+  59: bed
+  60: dining table
+  61: toilet
+  62: tv
+  63: laptop
+  64: mouse
+  65: remote
+  66: keyboard
+  67: cell phone
+  68: microwave
+  69: oven
+  70: toaster
+  71: sink
+  72: refrigerator
+  73: book
+  74: clock
+  75: vase
+  76: scissors
+  77: teddy bear
+  78: hair drier
+  79: toothbrush
+
+# Download script/URL — val2017 images ONLY. Deliberately does NOT include
+# train2017.zip (~19GB) or test2017.zip (~7GB), which Ultralytics' own
+# coco.yaml pulls unconditionally and this eval harness never needs.
+download: |
+  from pathlib import Path
+  from ultralytics.utils.downloads import download
+
+  dir = Path(yaml["path"])  # dataset root dir
+
+  # Labels (box + segment labels for all splits, same zip coco.yaml uses).
+  # Skip if already present to avoid re-downloading ~169MB unnecessarily.
+  if not (dir / "labels" / "val2017").exists():
+      url = "https://github.com/ultralytics/assets/releases/download/v0.0.0/"
+      download([url + "coco2017labels-segments.zip"], dir=dir.parent)
+
+  # Images — val2017 ONLY (~1GB, 5000 images).
+  download(
+      ["http://images.cocodataset.org/zips/val2017.zip"],
+      dir=dir / "images",
+      delete=True,
+  )

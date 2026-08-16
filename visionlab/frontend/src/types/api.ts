@@ -29,6 +29,35 @@ export interface TokenResponse {
   role: string
 }
 
+// ── UI customisation settings (mirrors backend UserSettingsUpdate) ────────────
+export type ThemeMode = 'light' | 'dark' | 'system'
+export type ThemeAccent = 'mono' | 'clay' | 'taupe' | 'ochre' | 'plum' | 'charcoal'
+export type Typography = 'editorial' | 'clean'
+export type FontSize = 14 | 16 | 18
+export type ReadingComfort = 'normal' | 'relaxed'
+export type Density = 'comfortable' | 'compact'
+export type SidebarState = 'expanded' | 'collapsed'
+export type ContentWidth = 'standard' | 'wide'
+export type Radius = 'rounded' | 'sharp'
+export type Separation = 'border' | 'shadow'
+
+export interface UiSettings {
+  _v?: number
+  mode?: ThemeMode
+  accent?: ThemeAccent
+  typography?: Typography
+  font_size?: FontSize
+  reading_comfort?: ReadingComfort
+  density?: Density
+  sidebar?: SidebarState
+  content_width?: ContentWidth
+  radius?: Radius
+  separation?: Separation
+  reduce_motion?: boolean
+  high_contrast?: boolean
+  underline_links?: boolean
+}
+
 export interface UserOut {
   id: string
   username: string
@@ -36,6 +65,7 @@ export interface UserOut {
   role: string
   is_active: boolean
   created_at: string
+  settings: UiSettings
 }
 
 export interface DetectionObject {

@@ -215,15 +215,19 @@ def run_ocr_step(
         return empty_ocr_result(), sec, exc
 
 
-def run_scene_step(
+def run_scene_raw_step(
     image: Image.Image,
     scene_model: str,
     detections: list[dict],
-    emotions: list[dict],
-    ocr: Optional[dict],
     task_id: str,
 ) -> tuple[dict, float, Optional[Exception]]:
-    logger.info("[%s] Running scene description with model '%s'...", task_id, scene_model)
+    """Generate the raw scene caption (local model only, no network call).
+
+    Runs concurrently with emotion/OCR since it only needs the image. The
+    Gemini enrichment pass happens afterwards in `run_scene_enrich_step`,
+    once emotion/OCR text is available to give it context.
+    """
+    logger.info("[%s] Running scene caption with model '%s'...", task_id, scene_model)
     t0 = time.time()
     try:
         result = generate_scene_description(image, scene_model=scene_model)
@@ -237,18 +241,36 @@ def run_scene_step(
                 sec,
                 RuntimeError("Scene model returned unavailable description"),
             )
-
-        raw_caption = result.get("description", "")
-        enriched = enrich_scene_description(raw_caption, detections, emotions, ocr)
-        result = {**result, "description": enriched}
-
         sec = time.time() - t0
-        logger.info("[%s] Scene took %.2fs", task_id, sec)
+        logger.info("[%s] Scene caption took %.2fs", task_id, sec)
         return result, sec, None
     except Exception as exc:
         sec = time.time() - t0
-        logger.warning("[%s] Scene description failed: %s", task_id, exc, exc_info=True)
+        logger.warning("[%s] Scene caption failed: %s", task_id, exc, exc_info=True)
         return fallback_scene_result(scene_model, detections), sec, exc
+
+
+def run_scene_enrich_step(
+    raw_result: dict,
+    detections: list[dict],
+    emotions: list[dict],
+    ocr: Optional[dict],
+    task_id: str,
+) -> tuple[dict, float, Optional[Exception]]:
+    """Enrich the raw caption via Gemini. Falls back silently to the raw caption on failure."""
+    logger.info("[%s] Enriching scene description...", task_id)
+    t0 = time.time()
+    try:
+        raw_caption = raw_result.get("description", "")
+        enriched = enrich_scene_description(raw_caption, detections, emotions, ocr)
+        result = {**raw_result, "description": enriched}
+        sec = time.time() - t0
+        logger.info("[%s] Scene enrichment took %.2fs", task_id, sec)
+        return result, sec, None
+    except Exception as exc:
+        sec = time.time() - t0
+        logger.warning("[%s] Scene enrichment failed: %s", task_id, exc, exc_info=True)
+        return raw_result, sec, exc
 
 
 def run_story_step(

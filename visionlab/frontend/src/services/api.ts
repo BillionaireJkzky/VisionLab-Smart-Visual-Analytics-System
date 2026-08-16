@@ -11,6 +11,7 @@ import type {
   ReviewWordResponse,
   TaskStatusResponse,
   TokenResponse,
+  UiSettings,
   UserOut,
   VocabularyProgressResponse,
 } from '../types/api'
@@ -65,6 +66,9 @@ export const authApi = {
   },
 
   me: () => client.get<UserOut>('/auth/me'),
+
+  updateSettings: (settings: UiSettings) =>
+    client.put<UserOut>('/auth/settings', settings, { timeout: 10000 }),
 
   logout: () => {
     localStorage.removeItem(TOKEN_KEY)

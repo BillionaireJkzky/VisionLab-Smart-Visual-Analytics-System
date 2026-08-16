@@ -10,9 +10,9 @@ interface SkeletonProps {
 }
 
 const roundedMap = {
-  sm:   'rounded',
-  md:   'rounded-md',
-  lg:   'rounded-xl',
+  sm:   'rounded-sm',
+  md:   'rounded',
+  lg:   'rounded-lg',
   full: 'rounded-full',
 }
 
@@ -25,7 +25,7 @@ export function Skeleton({
   gap = 'gap-2',
 }: SkeletonProps) {
   const base = twMerge(
-    'bg-white/[0.06] animate-pulse',
+    'bg-line animate-pulse',
     roundedMap[rounded],
     className,
   )

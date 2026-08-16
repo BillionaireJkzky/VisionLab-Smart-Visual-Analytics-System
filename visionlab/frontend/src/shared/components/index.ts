@@ -1,8 +1,6 @@
 export { Card } from './Card'
 export { Button } from './Button'
 export { Badge } from './Badge'
-export { GradientText } from './GradientText'
-export { GlowOrb } from './GlowOrb'
 export { Skeleton } from './Skeleton'
 export { DataReadout } from './DataReadout'
 export { ConfidenceBar } from './ConfidenceBar'

@@ -34,6 +34,11 @@ audio_outputs/*.mp3
 image_outputs/*.jpg
 image_outputs/*.png
 
+# Eval datasets/results are bind-mounted at runtime (see docker-compose.yml)
+# — never bake these into the image. eval/*.py is unaffected.
+eval/data/
+eval/results/
+
 # Tests and dev-only files
 tests/
 *.md

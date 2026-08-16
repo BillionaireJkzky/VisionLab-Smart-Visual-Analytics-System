@@ -108,6 +108,13 @@ def _get_pipeline(model_key: str, device: int):
 
         model_name = MODEL_NAMES[model_key]
 
+        # fp16 was tried here and measured SLOWER (5x) than fp32 on this GPU -
+        # the GTX 1660 Ti has no Tensor Cores (GTX, not RTX, despite same Turing
+        # generation), so fp16 gets no throughput benefit and just adds
+        # fp16<->fp32 casting overhead in this model's generation path. Do not
+        # re-add torch_dtype=torch.float16 without re-measuring on the actual
+        # target GPU first.
+
         logger.info(
             "Loading scene model '%s' (%s) on %s...",
             model_key,
@@ -139,6 +146,24 @@ def _get_pipeline(model_key: str, device: int):
             exc_info=True,
         )
         raise
+
+
+def warmup_scene(model_keys: list[str] | None = None) -> None:
+    """Pre-load the scene captioning pipeline(s) and run one dummy inference.
+
+    Without this, the first real request after a worker boot pays the full
+    HF pipeline construction + first-inference cost (~19s measured for GIT).
+    """
+    model_keys = model_keys or ["git"]
+    device = _get_device()
+    dummy = Image.new("RGB", (64, 64), color=(128, 128, 128))
+    for model_key in model_keys:
+        try:
+            pipe = _get_pipeline(model_key, device)
+            pipe(dummy, generate_kwargs=GENERATION_KWARGS.get(model_key, {}))
+            logger.info("Warmed up scene model: %s", model_key)
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("Scene warm-up failed for %s: %s", model_key, exc)
 
 
 def _normalize_spaces(text: str) -> str:

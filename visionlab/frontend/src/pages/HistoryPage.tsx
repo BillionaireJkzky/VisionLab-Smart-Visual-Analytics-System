@@ -6,7 +6,6 @@ import {
   Loader2,
   Trash2,
   XCircle,
-  Sparkles,
   History,
   CheckCircle2,
   AlertTriangle,
@@ -25,26 +24,21 @@ function SummaryCard({
   value,
   subtitle,
   icon: Icon,
-  accentClass,
 }: {
   title: string
   value: number
   subtitle: string
   icon: ComponentType<{ className?: string }>
-  accentClass: string
 }) {
   return (
     <SurfaceCard>
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs uppercase tracking-[0.16em] text-slate-400">{title}</p>
-          <p className={clsx('mt-3 text-4xl font-bold tracking-tight', accentClass)}>{value}</p>
-          <p className="mt-2 text-sm text-slate-400">{subtitle}</p>
+          <p className="text-[11px] font-mono uppercase tracking-[0.14em] text-ink-faint">{title}</p>
+          <p className="mt-3 text-3xl font-mono font-semibold tracking-tight text-ink">{value}</p>
+          <p className="mt-2 text-sm text-ink-muted">{subtitle}</p>
         </div>
-
-        <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
-          <Icon className={clsx('w-5 h-5', accentClass)} />
-        </div>
+        <Icon className="w-4 h-4 text-ink-muted shrink-0 mt-1" aria-hidden="true" />
       </div>
     </SurfaceCard>
   )
@@ -143,12 +137,10 @@ export default function HistoryPage() {
     return (
       <div className="flex items-center justify-center py-24">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-16 h-16 rounded-3xl border border-white/10 bg-white/[0.04] flex items-center justify-center">
-            <Loader2 className="w-8 h-8 text-cyan-300 animate-spin" />
-          </div>
+          <Loader2 className="w-6 h-6 text-ink-muted animate-spin" />
           <div className="text-center">
-            <p className="text-white font-medium">Loading analysis history</p>
-            <p className="text-sm text-slate-400 mt-1">Fetching your previous AI sessions...</p>
+            <p className="text-ink font-medium">Loading analysis history</p>
+            <p className="text-sm text-ink-muted mt-1">Fetching your previous sessions...</p>
           </div>
         </div>
       </div>
@@ -156,144 +148,112 @@ export default function HistoryPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto animate-fade-in">
-      <section
-        className="relative overflow-hidden border border-white/10 bg-gradient-to-br from-cyan-500/10 via-blue-500/10 to-fuchsia-500/10 shadow-2xl mb-8"
-        style={{ borderRadius: 'var(--theme-radius)' }}
-      >
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-14 right-0 w-72 h-72 rounded-full bg-cyan-400/10 blur-3xl" />
-          <div className="absolute bottom-0 left-1/4 w-72 h-72 rounded-full bg-fuchsia-500/10 blur-3xl" />
-        </div>
-
-        <div className="relative z-10 p-6 md:p-8">
-          <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-cyan-200 mb-4">
-            <Sparkles className="w-3.5 h-3.5" />
-            Analysis History
+    <div className="max-w-6xl mx-auto animate-fade-in space-y-10">
+      <header className="pb-8 border-b border-line">
+        <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_0.85fr] gap-8 items-start">
+          <div>
+            <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-ink-faint mb-4">
+              Analysis history
+            </p>
+            <h1 className="font-display text-3xl md:text-4xl font-medium text-ink leading-tight">
+              Revisit every session
+            </h1>
+            <p className="mt-4 max-w-2xl text-ink-muted leading-7">
+              Browse previous image analyses, track what completed successfully, and revisit
+              failed sessions.
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_0.85fr] gap-6 items-start">
-            <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-white leading-tight">
-                Revisit your AI analyses,
-                <br />
-                compare every session
-              </h1>
-              <p className="mt-4 max-w-2xl text-slate-300 leading-7">
-                Browse previous image analyses, track what completed successfully,
-                revisit failed sessions, and continue learning from your AI-generated results.
-              </p>
-            </div>
+          <div className="rounded-lg border border-line bg-paper-raised shadow-card p-5">
+            <p className="text-[11px] font-mono uppercase tracking-[0.14em] text-ink-faint mb-3">
+              Latest activity
+            </p>
 
-            <div
-              className="border border-white/10 bg-white/[0.05] backdrop-blur-xl"
-              style={{ borderRadius: 'var(--theme-radius)' }}
-            >
-              <div className="p-5">
-                <p className="text-xs uppercase tracking-[0.16em] text-slate-400 mb-2">
-                  Latest activity
+            {tasks[0] ? (
+              <>
+                <p className="text-base font-medium text-ink truncate">
+                  {tasks[0].original_filename ?? `Task ${tasks[0].task_id.slice(0, 8)}…`}
                 </p>
-
-                {tasks[0] ? (
-                  <>
-                    <p className="text-lg font-bold text-white truncate">
-                      {tasks[0].original_filename ?? `Task ${tasks[0].task_id.slice(0, 8)}…`}
-                    </p>
-                    <div className="mt-3 flex items-center gap-2 flex-wrap">
-                      <StatusBadge status={tasks[0].status} />
-                      <span className="text-sm text-slate-400">
-                        {new Date(tasks[0].created_at).toLocaleString()}
-                      </span>
-                    </div>
-                  </>
-                ) : (
-                  <p className="text-slate-300">No recent analysis yet.</p>
-                )}
-              </div>
-            </div>
+                <div className="mt-3 flex items-center gap-2 flex-wrap">
+                  <StatusBadge status={tasks[0].status} />
+                  <span className="text-sm text-ink-muted">
+                    {new Date(tasks[0].created_at).toLocaleString()}
+                  </span>
+                </div>
+              </>
+            ) : (
+              <p className="text-ink-muted">No recent analysis yet.</p>
+            )}
           </div>
         </div>
-      </section>
+      </header>
 
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <SummaryCard
           title="Completed"
           value={completedCount}
           subtitle="Finished analyses ready to revisit"
           icon={CheckCircle2}
-          accentClass="text-emerald-300"
         />
         <SummaryCard
-          title="In Progress"
+          title="In progress"
           value={processingCount}
           subtitle="Tasks that are queued or still running"
           icon={Activity}
-          accentClass="text-cyan-300"
         />
         <SummaryCard
           title="Failed"
           value={failedCount}
           subtitle="Sessions that need another try"
           icon={AlertTriangle}
-          accentClass="text-rose-300"
         />
       </section>
 
       {tasks.length === 0 ? (
-        <div
-          className="border border-white/10 bg-white/[0.04] backdrop-blur-xl shadow-2xl text-center"
-          style={{ borderRadius: 'var(--theme-radius)' }}
-        >
+        <div className="rounded-lg border border-line bg-paper-raised shadow-card text-center">
           <div className="py-16 px-6">
-            <div className="mx-auto w-16 h-16 rounded-3xl border border-white/10 bg-white/[0.05] flex items-center justify-center mb-5">
-              <History className="w-7 h-7 text-cyan-300" />
-            </div>
-
-            <h2 className="text-2xl font-bold text-white">No analysis history yet</h2>
-            <p className="mt-3 text-slate-400 max-w-xl mx-auto leading-7">
-              Start your first image analysis to build a rich history of AI-powered insights,
-              stories, audio, and learning progress.
+            <History className="w-6 h-6 text-ink-muted mx-auto mb-5" aria-hidden="true" />
+            <h2 className="font-display text-2xl font-medium text-ink">No analysis history yet</h2>
+            <p className="mt-3 text-ink-muted max-w-xl mx-auto leading-7">
+              Start your first image analysis to build a history of results, stories, audio,
+              and learning progress.
             </p>
-
             <div className="mt-6">
-              <Link to="/analyse" className="inline-flex items-center justify-center px-5 py-3 rounded-2xl bg-cyan-400 text-slate-950 font-semibold hover:bg-cyan-300 transition-colors">
-                Analyse Your First Image
+              <Link to="/analyse" className="btn-primary">
+                Analyse your first image
               </Link>
             </div>
           </div>
         </div>
       ) : (
-        <section
-          className="border border-white/10 bg-white/[0.04] backdrop-blur-xl shadow-2xl"
-          style={{ borderRadius: 'var(--theme-radius)' }}
-        >
-          <div className="p-5 md:p-6 border-b border-white/10">
+        <section className="rounded-lg border border-line bg-paper-raised shadow-card">
+          <div className="p-5 md:p-6 border-b border-line">
             <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
               <div>
-                <h2 className="text-2xl font-bold text-white">Analysis Timeline</h2>
-                <p className="text-slate-400 mt-1">
-                  Explore every uploaded image session and jump back into results instantly.
+                <h2 className="text-lg font-semibold text-ink">Timeline</h2>
+                <p className="text-sm text-ink-muted mt-1">
+                  Every uploaded image session — jump back into results instantly.
                 </p>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3 w-full xl:w-auto">
                 <div className="relative w-full sm:w-72">
-                  <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <Search className="w-4 h-4 text-ink-faint absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     placeholder="Search by task ID or status..."
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    className="w-full rounded-2xl border border-white/10 bg-white/[0.04] text-white placeholder:text-slate-500 pl-10 pr-4 py-3 outline-none focus:border-cyan-400/30"
+                    className="w-full rounded border border-line-strong bg-paper-raised text-ink placeholder:text-ink-faint pl-10 pr-4 py-2.5 text-sm outline-none transition-colors focus:border-ink"
                   />
                 </div>
 
                 <div className="relative w-full sm:w-52">
-                  <Filter className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <Filter className="w-4 h-4 text-ink-faint absolute left-3 top-1/2 -translate-y-1/2" />
                   <select
                     value={filter}
                     onChange={(e) => setFilter(e.target.value as typeof filter)}
-                    className="w-full appearance-none rounded-2xl border border-white/10 bg-white/[0.04] text-white pl-10 pr-4 py-3 outline-none focus:border-cyan-400/30"
+                    className="w-full appearance-none rounded border border-line-strong bg-paper-raised text-ink pl-10 pr-4 py-2.5 text-sm outline-none transition-colors focus:border-ink"
                   >
                     <option value="all">All statuses</option>
                     <option value="pending">Pending</option>
@@ -306,7 +266,7 @@ export default function HistoryPage() {
             </div>
           </div>
 
-          <div className="p-4 md:p-5 space-y-4">
+          <div className="p-4 md:p-5 space-y-3">
             {filteredTasks.map((t) => {
               const isWorking = actionTaskId === t.task_id
               const canCancel = t.status === 'pending' || t.status === 'processing'
@@ -316,33 +276,30 @@ export default function HistoryPage() {
                 <Link
                   key={t.task_id}
                   to={`/result/${t.task_id}`}
-                  className="group block border border-white/10 bg-white/[0.03] hover:bg-white/[0.05] transition-all shadow-xl"
-                  style={{ borderRadius: 'var(--theme-radius)' }}
+                  className="group block rounded border border-line bg-paper-raised hover:border-line-strong transition-colors"
                 >
-                  <div className="p-5 md:p-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
+                  <div className="p-5 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                     <div className="flex items-start gap-4 min-w-0">
-                      <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
-                        <Clock3 className="w-5 h-5 text-slate-400" />
-                      </div>
+                      <Clock3 className="w-4 h-4 text-ink-muted mt-1 shrink-0" aria-hidden="true" />
 
                       <div className="min-w-0">
                         <div className="flex items-center gap-3 flex-wrap">
-                          <p className="font-semibold text-white text-base truncate">
+                          <p className="font-medium text-ink text-sm truncate">
                             {t.original_filename ?? `Task ${t.task_id.slice(0, 8)}…`}
                           </p>
                           <StatusBadge status={t.status} />
                         </div>
 
-                        <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-400">
+                        <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-mono text-ink-faint">
                           <span>{new Date(t.created_at).toLocaleString()}</span>
                           {t.processing_ms ? (
-                            <span>Duration: {(t.processing_ms / 1000).toFixed(1)}s</span>
+                            <span>{(t.processing_ms / 1000).toFixed(1)}s</span>
                           ) : null}
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3 flex-wrap lg:flex-nowrap">
+                    <div className="flex items-center gap-2 flex-wrap lg:flex-nowrap">
                       {canCancel && (
                         <button
                           type="button"
@@ -352,9 +309,9 @@ export default function HistoryPage() {
                             handleCancel(t.task_id)
                           }}
                           disabled={isWorking}
-                          className="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-rose-300 bg-rose-500/10 border border-rose-400/10 hover:bg-rose-500/15 disabled:opacity-50"
+                          className="inline-flex items-center gap-2 rounded px-3 py-2 text-xs font-medium text-ink border border-line-strong hover:bg-paper disabled:opacity-50 transition-colors"
                         >
-                          <XCircle className="w-4 h-4" />
+                          <XCircle className="w-3.5 h-3.5" />
                           Cancel
                         </button>
                       )}
@@ -369,20 +326,18 @@ export default function HistoryPage() {
                           }}
                           disabled={isWorking}
                           className={clsx(
-                            'inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium border disabled:opacity-50 transition-colors',
+                            'inline-flex items-center gap-2 rounded px-3 py-2 text-xs font-medium border disabled:opacity-50 transition-colors',
                             pendingDelete === t.task_id
-                              ? 'text-white bg-rose-600/80 border-rose-500/50 hover:bg-rose-600'
-                              : 'text-rose-300 bg-rose-500/10 border-rose-400/10 hover:bg-rose-500/15'
+                              ? 'text-paper bg-ink border-ink'
+                              : 'text-ink border-line-strong hover:bg-paper'
                           )}
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-3.5 h-3.5" />
                           {pendingDelete === t.task_id ? 'Confirm?' : 'Delete'}
                         </button>
                       )}
 
-                      <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
-                        <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-white transition-colors" />
-                      </div>
+                      <ChevronRight className="w-4 h-4 text-ink-faint group-hover:text-ink transition-colors shrink-0" />
                     </div>
                   </div>
                 </Link>
@@ -391,8 +346,8 @@ export default function HistoryPage() {
 
             {filteredTasks.length === 0 && (
               <div className="px-6 py-12 text-center">
-                <p className="text-white font-medium">No matching analysis found</p>
-                <p className="text-sm text-slate-400 mt-2">
+                <p className="text-ink font-medium">No matching analysis found</p>
+                <p className="text-sm text-ink-muted mt-2">
                   Try another search term or change the status filter.
                 </p>
               </div>

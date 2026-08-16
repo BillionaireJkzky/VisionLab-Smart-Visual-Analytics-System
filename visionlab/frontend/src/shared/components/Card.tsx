@@ -1,30 +1,25 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 import { twMerge } from 'tailwind-merge'
 import { type ReactNode, type CSSProperties } from 'react'
+import { useSettings } from '../../hooks/useSettings'
+
+// Compact density shifts each padding step down one notch on the existing
+// scale (no new arbitrary values). Comfortable (default) is unaffected.
+const COMPACT_PADDING: Record<string, string> = {
+  none: '',
+  sm:   'p-3',
+  md:   'p-4',
+  lg:   'p-6',
+  xl:   'p-8',
+}
 
 const cardBase = cva(
-  'rounded-2xl border transition-all duration-300',
+  'rounded-lg border transition-colors duration-150',
   {
     variants: {
       variant: {
-        default:  [
-          'bg-white/[0.03] border-white/[0.07]',
-          'shadow-[0_20px_50px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.05)]',
-        ],
-        elevated: [
-          'bg-white/[0.06] border-white/[0.12]',
-          'shadow-[0_24px_60px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.08)]',
-        ],
-        glass: [
-          'backdrop-blur-xl bg-white/[0.04] border-white/[0.08]',
-          'shadow-[0_24px_60px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-1px_0_rgba(0,0,0,0.2)]',
-        ],
-        gradient: 'border-transparent bg-gradient-to-br from-indigo-500/10 via-violet-500/5 to-cyan-500/10',
-        glow: [
-          'bg-white/[0.04] backdrop-blur-xl',
-          'border-indigo-500/20',
-          'shadow-[0_0_40px_rgba(99,102,241,0.15),0_20px_50px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06)]',
-        ],
+        default:  ['bg-paper-raised border-line shadow-card'],
+        elevated: ['bg-paper-raised border-line-strong shadow-raised'],
       },
       padding: {
         none: '',
@@ -34,12 +29,12 @@ const cardBase = cva(
         xl:   'p-10',
       },
       hover: {
-        true:  'hover:-translate-y-1 hover:border-white/[0.14] cursor-pointer select-none',
+        true:  'hover:border-ink-faint cursor-pointer select-none',
         false: '',
       },
     },
     defaultVariants: {
-      variant: 'glass',
+      variant: 'default',
       padding: 'md',
       hover:   false,
     },
@@ -51,7 +46,6 @@ type CardVariants = VariantProps<typeof cardBase>
 interface CardProps extends CardVariants {
   children:      ReactNode
   className?:    string
-  gradientEdge?: string
   style?:        CSSProperties
   onClick?:      () => void
   as?:           'div' | 'section' | 'article'
@@ -64,15 +58,18 @@ export function Card({
   variant,
   padding,
   hover,
-  gradientEdge,
   style,
   onClick,
   as: Tag = 'div',
   'aria-label': ariaLabel,
 }: CardProps) {
-  const inner = (
+  const { committed } = useSettings()
+  const compactOverride = committed.density === 'compact' ? COMPACT_PADDING[padding ?? 'md'] : ''
+  const shadowSeparationOverride = committed.separation === 'shadow' ? 'border-transparent shadow-raised' : ''
+
+  return (
     <Tag
-      className={twMerge(cardBase({ variant, padding, hover }), className)}
+      className={twMerge(cardBase({ variant, padding, hover }), compactOverride, shadowSeparationOverride, className)}
       style={style}
       onClick={onClick}
       aria-label={ariaLabel}
@@ -80,21 +77,4 @@ export function Card({
       {children}
     </Tag>
   )
-
-  if (gradientEdge) {
-    return (
-      <div className="rounded-2xl p-px" style={{ background: gradientEdge }}>
-        <Tag
-          className={twMerge(cardBase({ variant: 'default', padding, hover }), 'rounded-[15px]', className)}
-          style={style}
-          onClick={onClick}
-          aria-label={ariaLabel}
-        >
-          {children}
-        </Tag>
-      </div>
-    )
-  }
-
-  return inner
 }

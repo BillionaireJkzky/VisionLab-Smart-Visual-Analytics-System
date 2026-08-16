@@ -37,22 +37,18 @@ export default class GlobalErrorBoundary extends Component<
     }
 
     return (
-      <main className="min-h-screen bg-[#07111f] text-slate-100 flex items-center justify-center p-6">
+      <main className="min-h-screen bg-paper text-ink flex items-center justify-center p-6">
         <section
-          className="w-full max-w-xl border border-white/10 bg-white/[0.05] backdrop-blur-xl rounded-3xl shadow-2xl p-6 md:p-8"
+          className="w-full max-w-xl border border-line rounded-lg bg-paper-raised shadow-card p-6 md:p-8"
           role="alert"
           aria-live="assertive"
         >
-          <p className="text-xs uppercase tracking-[0.16em] text-cyan-300 mb-3">VisionLab recovery mode</p>
-          <h1 className="text-2xl font-semibold text-white">Something went wrong on this page.</h1>
-          <p className="mt-3 text-slate-300 leading-7">
+          <p className="text-[11px] font-mono uppercase tracking-[0.14em] text-ink-faint mb-3">VisionLab recovery mode</p>
+          <h1 className="font-display text-2xl font-medium text-ink">Something went wrong on this page.</h1>
+          <p className="mt-3 text-ink-muted leading-7">
             The app hit an unexpected error. Your data is still safe. Please reload and try again.
           </p>
-          <button
-            type="button"
-            onClick={this.handleReload}
-            className="mt-6 px-5 py-3 rounded-2xl bg-cyan-400 text-slate-950 font-semibold hover:bg-cyan-300 transition-colors"
-          >
+          <button type="button" onClick={this.handleReload} className="btn-primary mt-6">
             Reload app
           </button>
         </section>
